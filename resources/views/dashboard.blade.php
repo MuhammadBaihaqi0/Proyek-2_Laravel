@@ -1,262 +1,206 @@
 <x-app-layout>
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-
-        .delay-100 {
-            animation-delay: 0.1s;
-        }
-
-        .delay-200 {
-            animation-delay: 0.2s;
-        }
-
-        .delay-300 {
-            animation-delay: 0.3s;
-        }
-
-        /* Hide scrollbar for clean look */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
-    </style>
-
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-bold text-xl text-gray-800 leading-tight tracking-wide">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Dashboard') }}
             </h2>
-            <div
-                class="hidden md:flex items-center space-x-2 text-sm font-medium text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full shadow-sm border border-indigo-100">
-                <span>🗓️</span>
-                <span>{{ $tanggalHariIni }}</span>
+            <div class="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200">
+                📅 {{ $tanggalHariIni }}
             </div>
         </div>
     </x-slot>
 
-    <div class="min-h-screen bg-gray-50 relative overflow-hidden pb-12">
-        <div
-            class="absolute top-0 left-0 w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2 animate-blob">
-        </div>
-        <div
-            class="absolute top-0 right-0 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/2 -translate-y-1/2 animate-blob animation-delay-2000">
-        </div>
+    <style>
+        /* Sembunyikan scrollbar tapi tetap bisa scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animasi Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+    </style>
 
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10 pt-8">
+    @php
+        $hour = date('H');
+        if ($hour >= 5 && $hour < 12) { $greeting = 'Selamat Pagi'; $icon = '☀️'; }
+        elseif ($hour >= 12 && $hour < 15) { $greeting = 'Selamat Siang'; $icon = '🌤️'; }
+        elseif ($hour >= 15 && $hour < 18) { $greeting = 'Selamat Sore'; $icon = '🌇'; }
+        else { $greeting = 'Selamat Malam'; $icon = '🌙'; }
+    @endphp
 
-            <div
-                class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-3xl shadow-xl overflow-hidden mb-10 animate-fade-in transform hover:scale-[1.01] transition duration-300">
-                <div class="p-8 md:flex items-center justify-between relative">
-                    <div class="absolute inset-0 bg-white opacity-10"
-                        style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;">
-                    </div>
-
-                    <div class="relative z-10 flex items-center space-x-6">
+    <div class="py-8 bg-gray-50 min-h-screen">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden text-white relative animate-fade-in">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <div class="absolute bottom-0 left-0 w-40 h-40 bg-pink-500 opacity-20 rounded-full -ml-10 -mb-10 blur-xl"></div>
+                
+                <div class="p-8 md:flex items-center justify-between relative z-10">
+                    <div class="flex items-center space-x-6">
                         <div class="relative">
-                            <div
-                                class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full blur opacity-75">
-                            </div>
-                            <img class="relative h-24 w-24 rounded-full object-cover border-4 border-white shadow-md"
-                                src="{{ $avatar_path }}" alt="{{ $user->username }}">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full blur opacity-50"></div>
+                            <img class="relative h-24 w-24 rounded-full object-cover border-4 border-white/30 shadow-lg" 
+                                 src="{{ $avatar_path }}" 
+                                 alt="{{ $user->username }}">
                         </div>
-                        <div class="text-white">
-                            <h3 class="text-3xl font-extrabold tracking-tight">Halo, {{ $user->username }}! 👋</h3>
-                            <p class="text-indigo-100 mt-1 text-lg">Siap menjadi produktif hari ini?</p>
-                            <div class="mt-4">
-                                <a href="{{ route('profile.edit') }}"
-                                    class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-sm font-semibold text-white hover:bg-white hover:text-indigo-600 transition duration-300 ease-in-out group">
-                                    <span>⚙️ Edit Profil</span>
-                                    <svg class="w-4 h-4 ml-2 transform group-hover:rotate-90 transition duration-300"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                        </path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
+                        <div>
+                            <h3 class="text-3xl font-bold tracking-tight">{{ $greeting }}, {{ $user->username }}! {{ $icon }}</h3>
+                            <p class="text-indigo-100 mt-1">Semoga harimu menyenangkan dan produktif!</p>
+                            <div class="mt-4 flex gap-3">
+                                <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-semibold transition border border-white/20">
+                                    ⚙️ Edit Profil
                                 </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="px-4 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg text-sm font-semibold transition shadow-md">
+                                        Log Out
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-6 md:mt-0 md:text-right text-white opacity-80 relative z-10 md:hidden">
-                        <p class="text-sm font-medium">{{ $tanggalHariIni }}</p>
+                    
+                    <div class="hidden md:block text-right max-w-xs opacity-90 border-l border-white/20 pl-6">
+                        <p class="italic text-sm">"Success is not final, failure is not fatal: it is the courage to continue that counts."</p>
+                        <p class="text-xs mt-2 font-bold">— Winston Churchill</p>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in delay-100">
+                <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-indigo-500 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold uppercase">Total Tugas</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ count($tugas) }}</p>
+                    </div>
+                    <div class="p-3 bg-indigo-50 rounded-lg text-indigo-600 text-xl">📝</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-emerald-500 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold uppercase">Acara Nanti</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ count($acara) }}</p>
+                    </div>
+                    <div class="p-3 bg-emerald-50 rounded-lg text-emerald-600 text-xl">🎉</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-orange-400 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold uppercase">Status Akun</p>
+                        <p class="text-lg font-bold text-green-600">Active</p>
+                    </div>
+                    <div class="p-3 bg-orange-50 rounded-lg text-orange-500 text-xl">✨</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-pink-500 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold uppercase">Bulan Ini</p>
+                        <p class="text-lg font-bold text-gray-800">{{ date('F') }}</p>
+                    </div>
+                    <div class="p-3 bg-pink-50 rounded-lg text-pink-500 text-xl">📅</div>
+                </div>
+            </div>
 
-                <div
-                    class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in delay-100 hover:shadow-xl transition duration-300 flex flex-col h-full">
-                    <div
-                        class="bg-gradient-to-r from-indigo-50 to-white p-6 border-b border-indigo-100 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold text-indigo-800 flex items-center">
-                                <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3 text-lg">📝</span>
-                                Tugas Baru
-                            </h3>
-                            <p class="text-xs text-indigo-400 mt-1 ml-12">Apa yang harus diselesaikan?</p>
-                        </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in delay-200">
+                
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+                    <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                            <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">📌</span> 
+                            Tugas Saya
+                        </h3>
+                        <span class="text-xs font-semibold bg-gray-200 text-gray-600 px-2 py-1 rounded">Pending: {{ count($tugas) }}</span>
                     </div>
 
                     <div class="p-6 flex-grow flex flex-col">
-                        <form action="{{ route('tugas.store') }}" method="POST" class="space-y-4">
+                        <form action="{{ route('tugas.store') }}" method="POST" class="mb-6 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
                             @csrf
-                            <div class="relative group">
-                                <input type="text" name="nama_tugas"
-                                    class="block w-full pl-4 pr-4 py-3 bg-gray-50 border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-indigo-500 focus:bg-white transition-colors peer"
-                                    placeholder=" " required>
-                                <label
-                                    class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-transparent px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Nama
-                                    Tugas</label>
-                            </div>
-
-                            <div class="flex space-x-3">
-                                <div class="w-full">
-                                    <input type="date" name="deadline"
-                                        class="block w-full px-4 py-3 bg-gray-50 border-gray-200 rounded-xl text-sm text-gray-600 focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
-                                        required>
+                            <label class="block text-xs font-bold text-indigo-600 uppercase mb-2">Tambah Baru</label>
+                            <div class="flex flex-col gap-3">
+                                <input type="text" name="nama_tugas" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Mau ngerjain apa?" required>
+                                <div class="flex gap-2">
+                                    <input type="date" name="deadline" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm text-gray-600" required>
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">
+                                        +
+                                    </button>
                                 </div>
-                                <button type="submit"
-                                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-200 transform active:scale-95 transition-all duration-200 flex items-center justify-center">
-                                    <span>+</span>
-                                </button>
                             </div>
                         </form>
 
-                        <div class="mt-8 flex-grow">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Daftar Tugas Anda
-                            </h4>
-                            <div class="space-y-3 max-h-[300px] overflow-y-auto no-scrollbar pr-2">
-                                @forelse($tugas as $t)
-                                    <div
-                                        class="group flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-200 transition-all duration-200 cursor-default">
-                                        <div class="flex items-center space-x-3 overflow-hidden">
-                                            <div class="flex-shrink-0 w-2 h-10 bg-indigo-500 rounded-full"></div>
-                                            <div class="truncate">
-                                                <p
-                                                    class="text-sm font-bold text-gray-800 group-hover:text-indigo-700 transition-colors truncate">
-                                                    {{ $t->nama_tugas }}</p>
-                                                <p class="text-xs text-gray-500 flex items-center mt-1">
-                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    {{ $t->deadline }}
-                                                </p>
-                                            </div>
+                        <div class="space-y-3 max-h-[350px] overflow-y-auto no-scrollbar pr-1">
+                            @forelse($tugas as $t)
+                                <div class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg shadow-sm hover:border-indigo-300 hover:shadow-md transition group">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 rounded-full bg-indigo-500 group-hover:scale-125 transition"></div>
+                                        <div>
+                                            <p class="font-semibold text-gray-800 text-sm">{{ $t->nama_tugas }}</p>
+                                            <p class="text-xs text-red-500">Deadline: {{ $t->deadline }}</p>
                                         </div>
-                                        <span
-                                            class="text-xs font-semibold px-2 py-1 bg-indigo-50 text-indigo-600 rounded-md">Active</span>
                                     </div>
-                                @empty
-                                    <div class="text-center py-8 opacity-50">
-                                        <div class="text-4xl mb-2">🍃</div>
-                                        <p class="text-sm text-gray-500">Belum ada tugas. Santai dulu!</p>
+                                    <div class="opacity-0 group-hover:opacity-100 transition">
+                                        <button class="text-gray-400 hover:text-green-600">✅</button>
                                     </div>
-                                @endforelse
-                            </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-10 opacity-60">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" class="w-16 h-16 mx-auto mb-3 opacity-50" alt="Empty">
+                                    <p class="text-sm text-gray-500">Kerjaan beres semua! Mantap.</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
 
-                <div
-                    class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in delay-200 hover:shadow-xl transition duration-300 flex flex-col h-full">
-                    <div
-                        class="bg-gradient-to-r from-emerald-50 to-white p-6 border-b border-emerald-100 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold text-emerald-800 flex items-center">
-                                <span class="bg-emerald-100 text-emerald-600 p-2 rounded-lg mr-3 text-lg">🎉</span>
-                                Acara Seru
-                            </h3>
-                            <p class="text-xs text-emerald-500 mt-1 ml-12">Jangan sampai terlewat!</p>
-                        </div>
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+                    <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                            <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">🎈</span> 
+                            Acara Seru
+                        </h3>
+                        <span class="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-1 rounded">Total: {{ count($acara) }}</span>
                     </div>
 
                     <div class="p-6 flex-grow flex flex-col">
-                        <form action="{{ route('acara.store') }}" method="POST" class="space-y-4">
+                        <form action="{{ route('acara.store') }}" method="POST" class="mb-6 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
                             @csrf
-                            <div class="relative group">
-                                <input type="text" name="nama_acara"
-                                    class="block w-full pl-4 pr-4 py-3 bg-gray-50 border-gray-200 rounded-xl text-sm focus:border-emerald-500 focus:ring-emerald-500 focus:bg-white transition-colors peer"
-                                    placeholder=" " required>
-                                <label
-                                    class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-transparent px-2 peer-focus:px-2 peer-focus:text-emerald-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Nama
-                                    Acara</label>
-                            </div>
-
-                            <div class="flex space-x-3">
-                                <div class="w-full">
-                                    <input type="date" name="tanggal"
-                                        class="block w-full px-4 py-3 bg-gray-50 border-gray-200 rounded-xl text-sm text-gray-600 focus:border-emerald-500 focus:ring-emerald-500 transition-colors"
-                                        required>
+                            <label class="block text-xs font-bold text-emerald-600 uppercase mb-2">Jadwalkan Acara</label>
+                            <div class="flex flex-col gap-3">
+                                <input type="text" name="nama_acara" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="Ada acara apa?" required>
+                                <div class="flex gap-2">
+                                    <input type="date" name="tanggal" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm text-gray-600" required>
+                                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">
+                                        +
+                                    </button>
                                 </div>
-                                <button type="submit"
-                                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-200 transform active:scale-95 transition-all duration-200 flex items-center justify-center">
-                                    <span>+</span>
-                                </button>
                             </div>
                         </form>
 
-                        <div class="mt-8 flex-grow">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Agenda Mendatang
-                            </h4>
-                            <div class="space-y-3 max-h-[300px] overflow-y-auto no-scrollbar pr-2">
-                                @forelse($acara as $a)
-                                    <div
-                                        class="group flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 cursor-default">
-                                        <div class="flex items-center space-x-3 overflow-hidden">
-                                            <div
-                                                class="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-xl flex flex-col items-center justify-center text-emerald-600 font-bold border border-emerald-200">
-                                                <span
-                                                    class="text-xs uppercase">{{ \Carbon\Carbon::parse($a->tanggal)->format('M') }}</span>
-                                                <span
-                                                    class="text-lg leading-none">{{ \Carbon\Carbon::parse($a->tanggal)->format('d') }}</span>
-                                            </div>
-                                            <div class="truncate">
-                                                <p
-                                                    class="text-sm font-bold text-gray-800 group-hover:text-emerald-700 transition-colors truncate">
-                                                    {{ $a->nama_acara }}</p>
-                                                <p class="text-xs text-gray-500 mt-1">
-                                                    {{ \Carbon\Carbon::parse($a->tanggal)->translatedFormat('l') }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="text-center py-8 opacity-50">
-                                        <div class="text-4xl mb-2">🎈</div>
-                                        <p class="text-sm text-gray-500">Belum ada acara. Bikin party dong!</p>
-                                    </div>
-                                @endforelse
-                            </div>
+                        <div class="space-y-4 max-h-[350px] overflow-y-auto no-scrollbar pr-1">
+                            @forelse($acara as $a)
+                                <div class="relative pl-6 border-l-2 border-emerald-200 hover:border-emerald-500 transition group">
+                                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-emerald-100 border-2 border-emerald-400 group-hover:bg-emerald-500 transition"></div>
+                                    <p class="text-xs text-gray-500 font-bold uppercase mb-0.5">{{ \Carbon\Carbon::parse($a->tanggal)->translatedFormat('l, d M Y') }}</p>
+                                    <h4 class="font-bold text-gray-800 group-hover:text-emerald-700 transition">{{ $a->nama_acara }}</h4>
+                                    <p class="text-xs text-gray-400 mt-1">{{ \Carbon\Carbon::parse($a->tanggal)->diffForHumans() }}</p>
+                                </div>
+                            @empty
+                                <div class="text-center py-10 opacity-60">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" class="w-16 h-16 mx-auto mb-3 opacity-50" alt="Empty">
+                                    <p class="text-sm text-gray-500">Belum ada agenda. Yuk jalan-jalan!</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
 
             </div>
+            
+            <div class="text-center text-gray-400 text-xs py-4">
+                &copy; {{ date('Y') }} Project Laravel by {{ $user->username }}. Dibuat dengan ☕ & ❤️.
+            </div>
+
         </div>
     </div>
 </x-app-layout>
