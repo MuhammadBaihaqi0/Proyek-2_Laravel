@@ -27,12 +27,13 @@ class LoginRequest extends FormRequest
      * @return array
      */
     public function rules(): array
-{
-    return [
-        'username' => ['required', 'string'],
-        'password' => ['required', 'string'],
-    ];
-}
+    {
+        return [
+            'username' => ['required', 'string'],
+            'password' => ['required', 'string'],
+            'captcha' => ['required', 'captcha'],
+        ];
+    }
 
     /**
      * Attempt to authenticate the request's credentials.
@@ -88,6 +89,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey()
     {
-        return Str::transliterate(Str::lower($this->input('username')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('username')) . '|' . $this->ip());
     }
 }
