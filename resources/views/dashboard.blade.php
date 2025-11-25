@@ -1,16 +1,43 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Dashboard') }}
-            </h2>
-            <div class="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200">
-                📅 {{ $tanggalHariIni }}
-            </div>
-        </div>
-    </x-slot>
+    <x-slot name="header"></x-slot>
 
     <style>
+        :root {
+            --page-bg: #f5f5fb;
+            --page-text: #1f1f2b;
+        }
+        body.theme-dark {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        body.theme-dark .bg-white,
+        body.theme-dark .sidebar-mini,
+        body.theme-dark .menu-link,
+        body.theme-dark .bg-gray-50,
+        body.theme-dark .bg-gray-100 {
+            background-color: #1c2333 !important;
+            color: #f3f4f6 !important;
+        }
+        body.theme-dark .menu-link span:first-child {
+            color: #cabffd !important;
+        }
+        body.theme-dark .menu-link:hover {
+            background-color: rgba(148, 119, 255, 0.18) !important;
+        }
+        body.theme-dark .menu-divider {
+            background: rgba(148,163,184,0.35);
+        }
+        body.theme-dark .theme-toggle {
+            background: rgba(148,163,184,0.15);
+            border-color: rgba(148,163,184,0.3);
+        }
+        body.theme-dark .theme-toggle button {
+            color: #e0e7ff;
+        }
+        body.theme-dark .theme-toggle button.active {
+            background: #fff;
+            color: #5b21b6;
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes fadeIn {
@@ -20,12 +47,258 @@
         .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
         .delay-100 { animation-delay: 0.1s; }
         .delay-200 { animation-delay: 0.2s; }
+        .dashboard-layout {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        @media (min-width: 1024px) {
+            .dashboard-layout {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+        .sidebar-mini {
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid rgba(99,102,241,0.1);
+            box-shadow: 0 20px 45px rgba(15,23,42,0.08);
+            position: sticky;
+            top: 6rem;
+            padding: 20px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            width: 100%;
+            transition: width 0.3s ease, padding 0.3s ease;
+        }
+        .dashboard-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 20px rgba(99,102,241,0.25);
+            transition: transform 0.3s ease;
+            margin: 0 auto;
+        }
+        @media (min-width: 1024px) {
+            .sidebar-mini {
+                width: 84px;
+                padding: 24px 16px;
+                overflow: hidden;
+            }
+            .sidebar-mini:hover {
+                width: 270px;
+                padding: 28px 22px;
+            }
+            .sidebar-mini:not(:hover) .menu-label,
+            .sidebar-mini:not(:hover) .menu-section-title,
+            .sidebar-mini:not(:hover) .logout-label {
+                opacity: 0;
+                transform: translateX(-12px);
+            }
+            .sidebar-mini:hover .dashboard-icon {
+                margin-left: 0;
+            }
+        }
+        .menu-section-title {
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            color: #b4b5d8;
+            font-weight: 700;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 16px;
+            font-weight: 600;
+            color: #7b7da6;
+            transition: background 0.2s ease, color 0.2s ease;
+            position: relative;
+        }
+        .menu-link span:first-child {
+            font-size: 1.1rem;
+        }
+        .menu-label {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .menu-label small {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: inherit;
+        }
+        .menu-link:hover {
+            background: rgba(124,58,237,0.08);
+            color: #4f46e5;
+        }
+        .menu-link-active {
+            background: linear-gradient(140deg, #8b5cf6, #6366f1);
+            color: #fff;
+            box-shadow: 0 12px 28px rgba(99,102,241,0.25);
+        }
+        .menu-divider {
+            height: 1px;
+            width: 100%;
+            background: rgba(148,163,184,0.25);
+        }
+        .theme-toggle {
+            margin-top: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(99,102,241,0.18);
+            background: rgba(244,241,255,0.9);
+            padding: 4px;
+            display: inline-flex;
+            width: 100%;
+            gap: 6px;
+        }
+        .theme-toggle button {
+            flex: 1;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b21a8;
+            padding: 6px 0;
+            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .theme-toggle button.active {
+            background: #fff;
+            color: #5b21b6;
+            box-shadow: 0 6px 12px rgba(111,76,255,0.18);
+        }
+        .logout-button {
+            border-radius: 16px;
+            border: 1px solid #fecdd3;
+            background: #fff4f5;
+            color: #be123c;
+            font-weight: 700;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+        .logout-button svg {
+            flex-shrink: 0;
+        }
+        .logout-label {
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .logout-button:hover {
+            background: #fee2e2;
+        }
     </style>
 
     <div class="py-8 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-            
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden text-white relative animate-fade-in">
+        <div class="w-full px-0">
+            <div class="dashboard-layout">
+                <aside class="sidebar-mini">
+                    <!-- <div class="dashboard-icon">📊</div> -->
+
+                    <div class="space-y-5">
+                        <p class="menu-section-title">MENU UTAMA</p>
+                        <nav class="space-y-2">
+                            <a href="#dashboard" class="menu-link menu-link-active">
+                                <span>📊</span>
+                                <span class="menu-label">
+                                    Dashboard
+                                    <small>(Active)</small>
+                                </span>
+                            </a>
+                            <a href="#tugas" class="menu-link">
+                                <span>📌</span>
+                                <span class="menu-label">Tugas Saya</span>
+                            </a>
+                            <a href="#acara" class="menu-link">
+                                <span>🎉</span>
+                                <span class="menu-label">Acara Saya</span>
+                            </a>
+                            <a href="#arsip" class="menu-link">
+                                <span>📂</span>
+                                <span class="menu-label">Arsip</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                     <div class="menu-divider"></div>
+ 
+                     <div class="space-y-2">
+                         <p class="menu-section-title flex items-center gap-1">
+                             ⚙️ PENGATURAN
+                         </p>
+                         <nav class="space-y-2">
+                             <a href="{{ route('profile.edit') }}" class="menu-link">
+                                 <span>⚙️</span>
+                                 <span class="menu-label">Edit Profil</span>
+                             </a>
+                             <a href="#" class="menu-link">
+                                 <span>🔐</span>
+                                 <span class="menu-label">Ubah Password</span>
+                             </a>
+                         </nav>
+                        <div>
+                            <p class="menu-section-title flex items-center gap-1 mt-4">
+                                🎨 TEMA & TAMPILAN
+                            </p>
+                            <div class="theme-toggle" role="group" aria-label="Theme toggle">
+                                <button type="button" class="theme-switch" data-theme="light">Terang</button>
+                                <button type="button" class="theme-switch" data-theme="dark">Gelap</button>
+                            </div>
+                        </div>
+                     </div>
+
+                    <div class="menu-divider"></div>
+
+                    <div class="space-y-2">
+                        <p class="menu-section-title flex items-center gap-1">
+                            📈 ANALITIK
+                        </p>
+                        <nav class="space-y-2">
+                            <a href="#" class="menu-link">
+                                <span>📊</span>
+                                <span class="menu-label">Statistik Tugas</span>
+                            </a>
+                            <a href="#" class="menu-link">
+                                <span>📅</span>
+                                <span class="menu-label">Laporan Bulanan</span>
+                            </a>
+                            <a href="#" class="menu-link">
+                                <span>🎯</span>
+                                <span class="menu-label">Progress Overview</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                        @csrf
+                        <button type="submit" class="logout-button w-full">
+                            <span>🚪</span>
+                            <span class="logout-label">Logout</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4h4m-4 0H5a1 1 0 00-1 1v14a1 1 0 001 1h2m4 0h4" />
+                            </svg>
+                        </button>
+                    </form>
+                </aside>
+
+                <div class="flex-1 space-y-8" id="dashboard">
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden text-white relative animate-fade-in">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                 <div class="absolute bottom-0 left-0 w-40 h-40 bg-pink-500 opacity-20 rounded-full -ml-10 -mb-10 blur-xl"></div>
                 
@@ -39,17 +312,6 @@
                         <div>
                             <h3 class="text-3xl font-bold tracking-tight">{{ $greeting }}, {{ $user->username }}! {{ $icon }}</h3>
                             <p class="text-indigo-100 mt-1">Semoga harimu menyenangkan dan produktif!</p>
-                            <div class="mt-4 flex gap-3">
-                                <a href="{{ route('profile.edit') }}" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-semibold transition border border-white/20">
-                                    ⚙️ Edit Profil
-                                </a>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg text-sm font-semibold transition shadow-md">
-                                        Log Out
-                                    </button>
-                                </form>
-                            </div>
                         </div>
                     </div>
                     <div class="hidden md:block text-right max-w-xs opacity-90 border-l border-white/20 pl-6">
@@ -90,7 +352,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in delay-200">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in delay-200" id="tugas">
                 
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
                     <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
@@ -140,7 +402,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full" id="acara">
                     <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-800 text-lg flex items-center">
                             <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">🎈</span> Acara Seru
@@ -180,7 +442,7 @@
                 </div>
             </div>
 
-            <div class="pt-8 border-t-2 border-dashed border-gray-300">
+            <div class="pt-8 border-t-2 border-dashed border-gray-300" id="arsip">
                 <h2 class="text-2xl font-bold text-gray-600 mb-6 flex items-center gap-2">
                     📂 Arsip Riwayat
                 </h2>
@@ -219,6 +481,42 @@
             <div class="text-center text-gray-400 text-xs py-4">
                 &copy; {{ date('Y') }} Project Laravel by {{ $user->username }}.
             </div>
+                </div>
+            </div>
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    (function() {
+        const root = document.documentElement;
+        const storedTheme = localStorage.getItem('dashboard-theme');
+        const body = document.body;
+        const themeButtons = document.querySelectorAll('.theme-switch');
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('theme-dark');
+            } else {
+                body.classList.remove('theme-dark');
+            }
+
+            themeButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === theme);
+            });
+
+            localStorage.setItem('dashboard-theme', theme);
+        }
+
+        themeButtons.forEach(btn => {
+            btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+        });
+
+        if (storedTheme) {
+            applyTheme(storedTheme);
+        } else {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(prefersDark ? 'dark' : 'light');
+        }
+    })();
+</script>
