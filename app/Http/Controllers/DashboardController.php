@@ -34,7 +34,7 @@ class DashboardController extends Controller
         // Greeting logic
         $hour = date('H');
         if ($hour >= 5 && $hour < 12) {
-            $greeting = 'Selamat Pagi';
+            $greeting = 'Hi kamu';
             $icon = '☀️';
         } elseif ($hour >= 12 && $hour < 15) {
             $greeting = 'Selamat Siang';
