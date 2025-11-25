@@ -53,7 +53,7 @@
                         </div>
                     </div>
                     <div class="hidden md:block text-right max-w-xs opacity-90 border-l border-white/20 pl-6">
-                        <p class="italic text-sm">"Success is not final, failure is not fatal: it is the courage to continue that counts."</p>
+                        <p class="italic text-sm">"Success is final, failure is not fatal: it is the courage to continue that counts."</p>
                         <p class="text-xs mt-2 font-bold">— Winston Churchill</p>
                     </div>
                 </div>
