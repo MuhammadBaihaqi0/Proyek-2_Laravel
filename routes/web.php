@@ -38,5 +38,6 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('tugas', TugasController::class);
     Route::resource('acara', AcaraController::class);
+    Route::patch('/tugas/{id}/selesai', [TugasController::class, 'selesai'])->name('tugas.selesai');
 });
 require __DIR__ . '/auth.php';

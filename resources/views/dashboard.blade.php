@@ -11,11 +11,8 @@
     </x-slot>
 
     <style>
-        /* Sembunyikan scrollbar tapi tetap bisa scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Animasi Fade In */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -24,14 +21,6 @@
         .delay-100 { animation-delay: 0.1s; }
         .delay-200 { animation-delay: 0.2s; }
     </style>
-
-    @php
-        $hour = date('H');
-        if ($hour >= 5 && $hour < 12) { $greeting = 'Selamat Pagi'; $icon = '☀️'; }
-        elseif ($hour >= 12 && $hour < 15) { $greeting = 'Selamat Siang'; $icon = '🌤️'; }
-        elseif ($hour >= 15 && $hour < 18) { $greeting = 'Selamat Sore'; $icon = '🌇'; }
-        else { $greeting = 'Selamat Malam'; $icon = '🌙'; }
-    @endphp
 
     <div class="py-8 bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
@@ -45,8 +34,7 @@
                         <div class="relative">
                             <div class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full blur opacity-50"></div>
                             <img class="relative h-24 w-24 rounded-full object-cover border-4 border-white/30 shadow-lg" 
-                                 src="{{ $avatar_path }}" 
-                                 alt="{{ $user->username }}">
+                                 src="{{ $avatar_path }}" alt="{{ $user->username }}">
                         </div>
                         <div>
                             <h3 class="text-3xl font-bold tracking-tight">{{ $greeting }}, {{ $user->username }}! {{ $icon }}</h3>
@@ -64,7 +52,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="hidden md:block text-right max-w-xs opacity-90 border-l border-white/20 pl-6">
                         <p class="italic text-sm">"Success is not final, failure is not fatal: it is the courage to continue that counts."</p>
                         <p class="text-xs mt-2 font-bold">— Winston Churchill</p>
@@ -89,8 +76,8 @@
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-orange-400 flex items-center justify-between hover:shadow-md transition">
                     <div>
-                        <p class="text-xs text-gray-500 font-bold uppercase">Status Akun</p>
-                        <p class="text-lg font-bold text-green-600">Active</p>
+                        <p class="text-xs text-gray-500 font-bold uppercase">Tugas Selesai</p>
+                        <p class="text-lg font-bold text-gray-800">{{ count($riwayat_tugas) }}</p>
                     </div>
                     <div class="p-3 bg-orange-50 rounded-lg text-orange-500 text-xl">✨</div>
                 </div>
@@ -108,8 +95,7 @@
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
                     <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-800 text-lg flex items-center">
-                            <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">📌</span> 
-                            Tugas Saya
+                            <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">📌</span> Tugas Saya
                         </h3>
                         <span class="text-xs font-semibold bg-gray-200 text-gray-600 px-2 py-1 rounded">Pending: {{ count($tugas) }}</span>
                     </div>
@@ -122,9 +108,7 @@
                                 <input type="text" name="nama_tugas" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Mau ngerjain apa?" required>
                                 <div class="flex gap-2">
                                     <input type="date" name="deadline" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm text-gray-600" required>
-                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">
-                                        +
-                                    </button>
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">+</button>
                                 </div>
                             </div>
                         </form>
@@ -139,9 +123,12 @@
                                             <p class="text-xs text-red-500">Deadline: {{ $t->deadline }}</p>
                                         </div>
                                     </div>
-                                    <div class="opacity-0 group-hover:opacity-100 transition">
-                                        <button class="text-gray-400 hover:text-green-600">✅</button>
-                                    </div>
+                                    <form action="{{ route('tugas.selesai', $t->id) }}" method="POST">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-md hover:bg-green-200 transition font-bold shadow-sm">
+                                            ✅ Selesai
+                                        </button>
+                                    </form>
                                 </div>
                             @empty
                                 <div class="text-center py-10 opacity-60">
@@ -156,8 +143,7 @@
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
                     <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-800 text-lg flex items-center">
-                            <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">🎈</span> 
-                            Acara Seru
+                            <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">🎈</span> Acara Seru
                         </h3>
                         <span class="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-1 rounded">Total: {{ count($acara) }}</span>
                     </div>
@@ -170,9 +156,7 @@
                                 <input type="text" name="nama_acara" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="Ada acara apa?" required>
                                 <div class="flex gap-2">
                                     <input type="date" name="tanggal" class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm text-gray-600" required>
-                                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">
-                                        +
-                                    </button>
+                                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">+</button>
                                 </div>
                             </div>
                         </form>
@@ -194,13 +178,47 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-            
+
+            <div class="pt-8 border-t-2 border-dashed border-gray-300">
+                <h2 class="text-2xl font-bold text-gray-600 mb-6 flex items-center gap-2">
+                    📂 Arsip Riwayat
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-100 p-6 rounded-2xl border border-gray-200 shadow-inner">
+                        <h4 class="font-bold text-gray-500 uppercase text-xs mb-4 tracking-wider">Tugas Selesai</h4>
+                        <ul class="space-y-2 max-h-[200px] overflow-y-auto no-scrollbar">
+                            @forelse($riwayat_tugas as $rt)
+                                <li class="flex justify-between items-center text-sm bg-white p-3 rounded-lg shadow-sm opacity-70 hover:opacity-100 transition">
+                                    <span class="line-through text-gray-500">{{ $rt->nama_tugas }}</span>
+                                    <span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">DONE</span>
+                                </li>
+                            @empty
+                                <li class="text-sm text-gray-400 italic text-center py-4">Belum ada tugas selesai.</li>
+                            @endforelse
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-100 p-6 rounded-2xl border border-gray-200 shadow-inner">
+                        <h4 class="font-bold text-gray-500 uppercase text-xs mb-4 tracking-wider">Acara Terlewat</h4>
+                        <ul class="space-y-2 max-h-[200px] overflow-y-auto no-scrollbar">
+                            @forelse($riwayat_acara as $ra)
+                                <li class="flex justify-between items-center text-sm bg-white p-3 rounded-lg shadow-sm opacity-70 hover:opacity-100 transition">
+                                    <span class="text-gray-600 font-medium">{{ $ra->nama_acara }}</span>
+                                    <span class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($ra->tanggal)->format('d M Y') }}</span>
+                                </li>
+                            @empty
+                                <li class="text-sm text-gray-400 italic text-center py-4">Belum ada acara lewat.</li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <div class="text-center text-gray-400 text-xs py-4">
-                &copy; {{ date('Y') }} Project Laravel by {{ $user->username }}. Dibuat dengan ☕ & ❤️.
+                &copy; {{ date('Y') }} Project Laravel by {{ $user->username }}.
             </div>
-
         </div>
     </div>
 </x-app-layout>

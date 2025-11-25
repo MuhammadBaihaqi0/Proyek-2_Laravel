@@ -37,16 +37,16 @@ class TugasController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-        'nama_tugas' => 'required|string|max:255',
-        'deskripsi' => 'nullable|string',
-        'deadline' => 'required|date',
-    ]);
+            'nama_tugas' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'deadline' => 'required|date',
+        ]);
 
-    // Menggunakan relasi untuk membuat tugas (otomatis mengisi user_id)
-    $request->user()->tugas()->create($validated);
+        // Menggunakan relasi untuk membuat tugas (otomatis mengisi user_id)
+        $request->user()->tugas()->create($validated);
 
-    // Kembali ke halaman sebelumnya (dashboard) dengan pesan sukses
-    return back()->with('success_message', 'Tugas berhasil ditambahkan!');
+        // Kembali ke halaman sebelumnya (dashboard) dengan pesan sukses
+        return back()->with('success_message', 'Tugas berhasil ditambahkan!');
     }
 
     /**
@@ -90,15 +90,24 @@ class TugasController extends Controller
      * @return \Illuminate\Http\Response
      */
     // app/Http/Controllers/TugasController.php
-public function destroy(Request $request, Tugas $tuga) // Laravel akan otomatis mencari Tugas berdasarkan ID
-{
-    // Cek apakah user pemilik tugas ini
-    if ($request->user()->id !== $tuga->user_id) {
-        abort(403); // Akses ditolak
+    public function destroy(Request $request, Tugas $tuga) // Laravel akan otomatis mencari Tugas berdasarkan ID
+    {
+        // Cek apakah user pemilik tugas ini
+        if ($request->user()->id !== $tuga->user_id) {
+            abort(403); // Akses ditolak
+        }
+
+        $tuga->delete();
+
+        return back()->with('success_message', 'Tugas berhasil dihapus!');
     }
+    // Fungsi untuk menandai tugas selesai
+    public function selesai($id)
+    {
+        $tugas = \App\Models\Tugas::findOrFail($id);
+        $tugas->status = 'selesai';
+        $tugas->save();
 
-    $tuga->delete();
-
-    return back()->with('success_message', 'Tugas berhasil dihapus!');
-}
+        return redirect()->back()->with('success', 'Tugas selesai!');
+    }
 }
