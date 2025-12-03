@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('tugas', TugasController::class);
     Route::resource('acara', AcaraController::class);
     Route::patch('/tugas/{id}/selesai', [TugasController::class, 'selesai'])->name('tugas.selesai');
+    //Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard_admin');
 });
 
 Route::middleware('auth')->group(function(){
