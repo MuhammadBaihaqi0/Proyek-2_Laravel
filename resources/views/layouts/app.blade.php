@@ -288,5 +288,9 @@
             {{ $slot }}
         </main>
     </div>
+
+    {{-- Masukkan partial pomodoro (safe: includeIf) --}}
+    @includeIf('partials._pomodoro')
+
 </body>
 </html>

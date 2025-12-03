@@ -5,7 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TugasController;
 use App\Http\Controllers\AcaraController;
-
+use App\Http\Controllers\PomodoroController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -39,5 +39,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('tugas', TugasController::class);
     Route::resource('acara', AcaraController::class);
     Route::patch('/tugas/{id}/selesai', [TugasController::class, 'selesai'])->name('tugas.selesai');
+});
+
+Route::middleware('auth')->group(function(){
+    Route::post('/pomodoro/start', [PomodoroController::class, 'start']);
+    Route::post('/pomodoro/finish', [PomodoroController::class, 'finish']);
+    Route::post('/pomodoro/focus-ended', [PomodoroController::class, 'focusEnded']);
 });
 require __DIR__ . '/auth.php';

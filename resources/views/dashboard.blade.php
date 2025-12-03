@@ -130,12 +130,30 @@
                                                 <p class="text-xs text-red-500">Deadline: {{ $t->deadline }}</p>
                                             </div>
                                         </div>
-                                        <form action="{{ route('tugas.selesai', $t->id) }}" method="POST">
-                                            @csrf @method('PATCH')
-                                            <button type="submit" class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-md hover:bg-green-200 transition font-bold shadow-sm">
-                                                ✅ Selesai
+
+                                        <div class="flex items-center gap-2">
+                                            <form action="{{ route('tugas.selesai', $t->id) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-md hover:bg-green-200 transition font-bold shadow-sm">
+                                                    ✅ Selesai
+                                                </button>
+                                            </form>
+
+                                            <!-- Mulai Pomodoro (baru) -->
+                                            <button type="button"
+                                                    class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-md hover:bg-indigo-700 transition font-bold shadow-sm"
+                                                    data-start-pomodoro="{{ $t->id }}"
+                                                    data-task-title="{{ e($t->nama_tugas) }}">
+                                                ▶ Mulai Pomodoro
                                             </button>
-                                        </form>
+
+                                            <!-- Stop Pomodoro (opsional) -->
+                                            <button type="button"
+                                                    class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 transition font-bold shadow-sm"
+                                                    data-stop-pomodoro="{{ $t->id }}">
+                                                ■ Stop
+                                            </button>
+                                        </div>
                                     </div>
                                 @empty
                                     <div class="text-center py-10 opacity-60">
@@ -232,27 +250,43 @@
             </div>
         </div>
     </div>
+
+    {{-- include pomodoro partial if not included in layout --}}
+    {{-- If your layout already includes it, you can remove one of the duplicates --}}
+    @includeIf('partials._pomodoro')
 </x-app-layout>
 
 <script>
-    (function() {
-        const storedTheme = localStorage.getItem('dashboard-theme');
-        const body = document.body;
+/* fallback event binding: pastikan tombol data-start-pomodoro ter-handle */
+(function(){
+  function bindOnce(){
+    if(window._pom_bound) return;
+    window._pom_bound = true;
 
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                body.classList.add('theme-dark');
-            } else {
-                body.classList.remove('theme-dark');
-            }
-            localStorage.setItem('dashboard-theme', theme);
-        }
-
-        if (storedTheme) {
-            applyTheme(storedTheme);
+    // delegate click untuk start buttons
+    document.addEventListener('click', function(e){
+      const start = e.target.closest && e.target.closest('[data-start-pomodoro]');
+      if(start){
+        const id = start.getAttribute('data-start-pomodoro') || null;
+        const title = start.getAttribute('data-task-title') || start.getAttribute('data-task-name') || null;
+        if(window.startTaskPomodoro) {
+          window.startTaskPomodoro(id, title);
         } else {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            applyTheme(prefersDark ? 'dark' : 'light');
+          console.warn('startTaskPomodoro not defined yet; trying to call startPomodoro fallback.');
+          if(window.startPomodoro) window.startPomodoro();
         }
-    })();
+      }
+      const stop = e.target.closest && e.target.closest('[data-stop-pomodoro]');
+      if(stop){
+        const id = stop.getAttribute('data-stop-pomodoro') || null;
+        if(window.stopTaskPomodoro) window.stopTaskPomodoro(id);
+        else if(window.stopPomodoro) window.stopPomodoro();
+      }
+    }, {capture: true});
+  }
+
+  // If DOM already ready, bind immediately
+  if(document.readyState === 'complete' || document.readyState === 'interactive') bindOnce();
+  else document.addEventListener('DOMContentLoaded', bindOnce);
+})();
 </script>
