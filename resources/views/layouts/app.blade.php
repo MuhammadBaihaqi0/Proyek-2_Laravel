@@ -170,8 +170,8 @@
             justify-content: center;
             gap: 10px;
             padding: 12px 16px;
-            background: #ffe8e8;
-            color: #d32f2f;
+            background: #d32f2f;
+            color: #ffffff;
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -182,6 +182,7 @@
         }
         
         .logout-btn:hover {
+            color: #8b8ba3;
             background: #ffd1d1;
             transform: translateX(4px);
         }
