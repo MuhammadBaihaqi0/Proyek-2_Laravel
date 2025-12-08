@@ -72,22 +72,20 @@
             flex-direction: column;
             gap: 2rem;
         }
-        /* Style untuk progress bar */
-        .progress-ring__circle { 
-            transition: stroke-dashoffset 0.35s; 
-            transform: rotate(-90deg); 
-            transform-origin: 50% 50%; 
-        }
     </style>
 
     <div class="py-8 bg-gray-50 min-h-screen">
         <div class="w-full px-0">
             <div class="dashboard-content">
-                <!-- Greeting Card -->
-                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden text-white relative animate-fade-in">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                    <div class="absolute bottom-0 left-0 w-40 h-40 bg-pink-500 opacity-20 rounded-full -ml-10 -mb-10 blur-xl"></div>
-                    
+                <div
+                    class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden text-white relative animate-fade-in">
+                    <div
+                        class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-16 -mt-16 blur-2xl">
+                    </div>
+                    <div
+                        class="absolute bottom-0 left-0 w-40 h-40 bg-pink-500 opacity-20 rounded-full -ml-10 -mb-10 blur-xl">
+                    </div>
+
                     <div class="p-8 md:flex items-center justify-between relative z-10">
                         <div class="flex items-center space-x-6">
                             <div class="relative">
@@ -147,8 +145,8 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in delay-200">
-                    <!-- Tugas Saya Section -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+                    <div
+                        class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
                         <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                             <h3 class="font-bold text-gray-800 text-lg flex items-center">
                                 <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">📌</span> Tugas Saya
@@ -205,14 +203,23 @@
                                                 data-start-pomodoro="{{ $t->id }}"
                                                 data-task-title="{{ e($t->nama_tugas) }}">
                                                 ▶ Mulai Pomodoro
-                                            </button>
+                                        </button>
 
-                                            <!-- Stop Pomodoro (opsional) -->
-                                            <button type="button"
-                                                    class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 transition font-bold shadow-sm"
-                                                    data-stop-pomodoro="{{ $t->id }}">
-                                                ■ Stop
-                                            </button>
+                                            <form action="{{ route('tugas.destroy', $t->id) }}" method="POST"
+                                                onsubmit="return confirm('Hapus tugas ini?')" class="flex-shrink-0">
+                                                @csrf @method('DELETE')
+                                                <button type="submit"
+                                                    class="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition"
+                                                    title="Hapus Tugas">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 @empty
@@ -225,9 +232,8 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Acara Seru Section -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+                    <div
+                        class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
                         <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                             <h3 class="font-bold text-gray-800 text-lg flex items-center">
                                 <span class="bg-white shadow-sm p-1.5 rounded-md mr-2 text-xl">🎈</span> Acara Seru
@@ -303,11 +309,10 @@
                         </div>
                     </div>
 
-                <!-- Arsip Section -->
-                <div class="pt-8 border-t-2 border-dashed border-gray-300">
-                    <h2 class="text-2xl font-bold text-gray-600 mb-6 flex items-center gap-2">
-                        📂 Arsip Riwayat
-                    </h2>
+                    <div class="pt-8 border-t-2 border-dashed border-gray-300">
+                        <h2 class="text-2xl font-bold text-gray-600 mb-6 flex items-center gap-2">
+                            📂 Arsip Riwayat
+                        </h2>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-gray-100 p-6 rounded-2xl border border-gray-200 shadow-inner">
@@ -348,13 +353,12 @@
                         </div>
                     </div>
 
-                <!-- Footer -->
-                <div class="text-center text-gray-400 text-xs py-4">
-                    &copy; {{ date('Y') }} Project Laravel by {{ $user->username }}.
+                    <div class="text-center text-gray-400 text-xs py-4">
+                        &copy; {{ date('Y') }} Project Laravel by {{ $user->username }}.
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
         {{-- include pomodoro partial if not included in layout --}}
         {{-- If your layout already includes it, you can remove one of the duplicates --}}
@@ -396,8 +400,8 @@
             });
         }
 
-  // If DOM already ready, bind immediately
-  if(document.readyState === 'complete' || document.readyState === 'interactive') bindOnce();
-  else document.addEventListener('DOMContentLoaded', bindOnce);
-})();
+        // If DOM already ready, bind immediately
+        if (document.readyState === 'complete' || document.readyState === 'interactive') bindOnce();
+        else document.addEventListener('DOMContentLoaded', bindOnce);
+    })();
 </script>
