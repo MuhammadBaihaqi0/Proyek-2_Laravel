@@ -256,6 +256,12 @@
     @includeIf('partials._pomodoro')
 </x-app-layout>
 
+// views/dashboard.blade.php
+
+// (Hanya bagian <script> di paling bawah yang perlu diubah)
+
+// ... (HTML dashboard di atas) ...
+
 <script>
 /* fallback event binding: pastikan tombol data-start-pomodoro ter-handle */
 (function(){
@@ -267,6 +273,7 @@
     document.addEventListener('click', function(e){
       const start = e.target.closest && e.target.closest('[data-start-pomodoro]');
       if(start){
+        e.preventDefault(); // TAMBAH: Cegah perilaku default
         const id = start.getAttribute('data-start-pomodoro') || null;
         const title = start.getAttribute('data-task-title') || start.getAttribute('data-task-name') || null;
         if(window.startTaskPomodoro) {
@@ -278,6 +285,7 @@
       }
       const stop = e.target.closest && e.target.closest('[data-stop-pomodoro]');
       if(stop){
+        e.preventDefault(); // TAMBAH: Cegah perilaku default
         const id = stop.getAttribute('data-stop-pomodoro') || null;
         if(window.stopTaskPomodoro) window.stopTaskPomodoro(id);
         else if(window.stopPomodoro) window.stopPomodoro();

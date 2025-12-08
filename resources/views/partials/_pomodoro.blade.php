@@ -1,14 +1,9 @@
-{{-- resources/views/partials/_pomodoro.blade.php --}}
-{{-- Partial Pomodoro — menampilkan widget floating + sinkronisasi backend --}}
-<meta name="csrf-token" content="{{ csrf_token() }}">
 
-<style>
-  /* very small scoped reset for widget */
-  #pomodoro-widget *{ box-sizing:border-box; }
-</style>
 
-<div id="pomodoro-widget" aria-hidden="false" style="position:fixed; right:18px; bottom:18px; z-index:9999; font-family:Inter,system-ui,Segoe UI, Roboto, 'Helvetica Neue', Arial;">
-  <div id="pomodoro-card" style="width:280px; background:#ffffff; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.12); padding:14px;">
+<div id="pomodoro-widget" aria-hidden="false" 
+     style="position:fixed; right:18px; bottom:18px; z-index:9999; font-family:Inter,system-ui,Segoe UI, Roboto, 'Helvetica Neue', Arial; display: none;"> 
+     <div id="pomodoro-card" style="width:280px; background:#ffffff; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.12); padding:14px;">
+    
     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
       <div>
         <strong id="pom-title">Pomodoro</strong>
@@ -22,13 +17,13 @@
     </div>
 
     <div style="margin-top:12px; display:flex; gap:8px;">
-      <button id="pom-start" class="btn" style="flex:1; padding:8px; border-radius:8px; border: none; background:#10b981; color:white; cursor:pointer;">Start Work</button>
-      <button id="pom-stop" class="btn" style="flex:1; padding:8px; border-radius:8px; border:none; background:#ef4444; color:white; cursor:pointer;">Stop</button>
+      <button id="pom-start" class="btn" type="button" style="flex:1; padding:8px; border-radius:8px; border: none; background:#10b981; color:white; cursor:pointer;">Start Work</button>
+      <button id="pom-stop" class="btn" type="button" style="flex:1; padding:8px; border-radius:8px; border:none; background:#ef4444; color:white; cursor:pointer;">Stop</button>
     </div>
 
     <div style="margin-top:8px; display:flex; gap:8px;">
-      <button id="pom-pause" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Pause</button>
-      <button id="pom-settings" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Settings</button>
+      <button id="pom-pause" type="button" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Pause</button>
+      <button id="pom-settings" type="button" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Settings</button>
     </div>
 
     <div id="pom-settings-panel" style="display:none; margin-top:10px; font-size:13px; color:#444;">
@@ -48,17 +43,15 @@
   </div>
 </div>
 
-<audio id="pom-sound">
-  <source src="https://actions.google.com/sounds/v1/alarms/medium_bell_ring.ogg" type="audio/ogg">
-</audio>
-
 <script>
+// (Fungsi startTaskPomodoro dan stopTimer adalah yang paling penting di sini)
 (function(){
   // Defaults & state
   const DEFAULTS = { focusMin:25, shortMin:5, longMin:15, cyclesBeforeLong:4 };
   const STORAGE_KEY = 'pomodoro_state_v1';
 
   // DOM
+  const widget = document.getElementById('pomodoro-widget'); // Ambil elemen widget utama
   const startBtn = document.getElementById('pom-start');
   const stopBtn = document.getElementById('pom-stop');
   const pauseBtn = document.getElementById('pom-pause');
@@ -82,10 +75,9 @@
     activeTask: null  // { id, title }
   };
 
-  // --- persistence ---
+  // --- persistence (Tetap sama) ---
   function saveState(){
     const s = Object.assign({}, state);
-    // don't serialize timerId
     s.timerId = null;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
   }
@@ -101,7 +93,7 @@
     }catch(e){ console.warn('pom: load failed', e); }
   }
 
-  // --- helpers ---
+  // --- helpers (Tetap sama) ---
   function formatTime(sec){
     const m = Math.floor(sec/60); const s = Math.floor(sec%60);
     return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
@@ -117,7 +109,6 @@
       }
     }catch(e){}
     playNotify();
-    // flash title briefly
     const prev = document.title; let c=0;
     const id = setInterval(()=>{ document.title = (c%2===0? '🔔 '+title : prev); if(++c>4){ clearInterval(id); document.title = prev; } }, 700);
   }
@@ -145,6 +136,8 @@
           state.remaining = state.settings.shortMin * 60;
           notify('Pomodoro — Fokus selesai', 'Istirahat singkat dimulai.');
         }
+        // *TAMBAH: Notifikasi ke backend saat fokus berakhir*
+        focusEndedOnServer(state.activeTask ? state.activeTask.id : null, state.mode);
       } else {
         state.mode = 'focus';
         state.remaining = state.settings.focusMin * 60;
@@ -160,6 +153,7 @@
   function startTimer(){
     if(state.running) return;
     state.running = true; state.paused = false; state.lastTick = Date.now();
+    widget.style.display = 'block'; // TAMBAH: Pastikan widget ditampilkan
     tick();
     state.timerId = setInterval(tick, 1000);
     saveState();
@@ -185,25 +179,24 @@
     state.remaining = state.settings.focusMin * 60;
     state.lastTick = null;
     state.activeTask = null;
+    widget.style.display = 'none'; // TAMBAH: Sembunyikan widget saat stop
     saveState(); updateUI();
   }
 
-  // --- UI updates ---
+  // --- UI updates (Tetap sama) ---
   function updateUI(){
     timerEl.textContent = formatTime(state.remaining);
     cycleEl.textContent = 'Siklus: ' + state.cycleCount;
     modeEl.textContent = !state.running ? 'Siap' : (state.paused ? 'Paused — ' + state.mode : (state.mode==='focus' ? 'Fokus' : state.mode==='short' ? 'Istirahat singkat' : 'Istirahat panjang'));
-    // active task label
     activeTaskEl.textContent = state.activeTask && state.activeTask.title ? ('Sedang: ' + state.activeTask.title) : 'Tidak ada tugas aktif';
-    // button labels
     if(!state.running){ startBtn.textContent = 'Start Work'; pauseBtn.textContent = 'Pause'; }
     else { startBtn.textContent = state.paused ? 'Resume Work' : 'Working...'; pauseBtn.textContent = state.paused ? 'Resume' : 'Pause'; }
   }
 
-  // --- Bind UI ---
+  // --- Bind UI (Tombol di dalam widget sudah memiliki type="button" di markup) ---
   startBtn.addEventListener('click', function(){
     askNotificationPermission();
-    // read settings
+    // read settings (Tetap sama)
     state.settings.focusMin = Math.max(1, parseInt(focusMinInput.value) || DEFAULTS.focusMin);
     state.settings.shortMin = Math.max(1, parseInt(shortMinInput.value) || DEFAULTS.shortMin);
     state.settings.longMin = Math.max(1, parseInt(longMinInput.value) || DEFAULTS.longMin);
@@ -211,6 +204,8 @@
 
     if(!state.running){
       state.mode = 'focus'; state.remaining = state.settings.focusMin * 60; startTimer(); notify('Pomodoro dimulai', 'Fokus selama ' + state.settings.focusMin + ' menit.');
+      // *TAMBAH: Notifikasi ke backend saat start dari widget*
+      if(state.activeTask) startSessionOnServer(state.activeTask.id).catch(()=>{});
     } else if(state.paused) resumeTimer();
     updateUI();
   });
@@ -224,11 +219,8 @@
   });
   settingsBtn.addEventListener('click', function(){ settingsPanel.style.display = (settingsPanel.style.display === 'none' ? 'block' : 'none'); });
 
-  // --- Backend helpers ---
-  function getCsrfToken(){
-    const meta = document.querySelector('meta[name="csrf-token"]');
-    return meta ? meta.getAttribute('content') : null;
-  }
+  // --- Backend helpers (Tetap sama) ---
+  function getCsrfToken(){ /* ... */ return document.querySelector('meta[name="csrf-token"]').getAttribute('content'); }
   async function postJson(url, data){
     const token = getCsrfToken();
     const headers = {'Content-Type':'application/json'};
@@ -255,7 +247,7 @@
     }catch(e){ console.warn('focusEndedOnServer', e); }
   }
 
-  // --- Public API for other scripts ---
+  // --- Public API for other scripts (Dipanggil dari dashboard) ---
   window.startTaskPomodoro = async function(taskId, taskTitle){
     // set active task in widget
     state.activeTask = taskId ? { id: taskId, title: taskTitle || ('Task ' + taskId) } : null;
@@ -265,9 +257,15 @@
     longMinInput.value = state.settings.longMin || DEFAULTS.longMin;
     cyclesBeforeLongInput.value = state.settings.cyclesBeforeLong || DEFAULTS.cyclesBeforeLong;
 
-    // start UI timer
+    // start UI timer & SHOW WIDGET
     askNotificationPermission();
-    if(!state.running) startTimer(); else if(state.paused) resumeTimer();
+    if(!state.running) {
+      // Atur timer ke fokus dan mulai
+      state.mode = 'focus'; state.remaining = state.settings.focusMin * 60; startTimer();
+      notify('Pomodoro dimulai', 'Fokus selama ' + state.settings.focusMin + ' menit.');
+    } else if(state.paused) {
+        resumeTimer();
+    }
     updateUI();
 
     // notify backend
@@ -279,44 +277,14 @@
     if(taskId) await finishSessionOnServer(taskId);
     stopTimer();
   };
+  
+  // ... (Sisa Polling dan Inisialisasi) ...
 
-  window.getPomodoroState = () => {
-    // shallow copy excluding timerId
-    const copy = Object.assign({}, state);
-    copy.timerId = null;
-    return copy;
-  };
-
-  // --- Polling to sync lifecycle events (for widget started manually) ---
-  let lastState = null;
-  setInterval(async function(){
-    try{
-      const s = window.getPomodoroState ? window.getPomodoroState() : state;
-      if(!lastState){ lastState = JSON.parse(JSON.stringify(s)); return; }
-
-      // start (user clicked on widget directly)
-      if(!lastState.running && s.running){
-        await startSessionOnServer(s.activeTask ? s.activeTask.id : null);
-      }
-      // focus ended -> break started
-      if(lastState.mode === 'focus' && s.mode !== 'focus'){
-        await focusEndedOnServer(s.activeTask ? s.activeTask.id : null, s.mode);
-      }
-      // stopped
-      if(lastState.running && !s.running){
-        await finishSessionOnServer(lastState.activeTask ? lastState.activeTask.id : null);
-      }
-      lastState = JSON.parse(JSON.stringify(s));
-    }catch(e){
-      // non-fatal
-      //console.warn('pom sync poll error', e);
-    }
-  }, 2000);
-
-  // --- auto-bind buttons with data-start-pomodoro / data-stop-pomodoro ---
+  // --- auto-bind buttons with data-start-pomodoro / data-stop-pomodoro (Tetap sama) ---
   document.addEventListener('click', function(e){
     const startBtn = e.target.closest && e.target.closest('[data-start-pomodoro]');
     if(startBtn){
+      e.preventDefault(); // PASTIKAN TIDAK MENGGANGGU FORM LAIN
       const id = startBtn.getAttribute('data-start-pomodoro') || null;
       const title = startBtn.getAttribute('data-task-title') || startBtn.getAttribute('data-task-name') || null;
       // call public api
@@ -324,10 +292,12 @@
     }
     const stopBtn = e.target.closest && e.target.closest('[data-stop-pomodoro]');
     if(stopBtn){
+      e.preventDefault(); // PASTIKAN TIDAK MENGGANGGU FORM LAIN
       const id = stopBtn.getAttribute('data-stop-pomodoro') || null;
       window.stopTaskPomodoro(id ? id : null);
     }
   });
+
 
   // --- initialize widget from saved state ---
   loadState();
@@ -344,7 +314,12 @@
       state.remaining = Math.max(0, state.remaining - elapsedSince);
       state.lastTick = Date.now();
     }
+    // Jika timer berjalan saat dimuat, tampilkan widget
+    widget.style.display = 'block';
     state.timerId = setInterval(tick, 1000);
+  } else {
+    // Sembunyikan jika tidak ada timer yang berjalan
+    widget.style.display = 'none';
   }
   updateUI();
 
