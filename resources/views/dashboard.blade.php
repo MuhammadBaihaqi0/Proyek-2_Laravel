@@ -35,12 +35,17 @@
             flex-direction: column;
             gap: 2rem;
         }
+        /* Style untuk progress bar */
+        .progress-ring__circle { 
+            transition: stroke-dashoffset 0.35s; 
+            transform: rotate(-90deg); 
+            transform-origin: 50% 50%; 
+        }
     </style>
 
     <div class="py-8 bg-gray-50 min-h-screen">
         <div class="w-full px-0">
             <div class="dashboard-content">
-                <!-- Greeting Card -->
                 <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden text-white relative animate-fade-in">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                     <div class="absolute bottom-0 left-0 w-40 h-40 bg-pink-500 opacity-20 rounded-full -ml-10 -mb-10 blur-xl"></div>
@@ -64,7 +69,6 @@
                     </div>
                 </div>
 
-                <!-- Stats Cards -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in delay-100">
                     <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-indigo-500 flex items-center justify-between hover:shadow-md transition">
                         <div>
@@ -96,9 +100,7 @@
                     </div>
                 </div>
 
-                <!-- Main Content Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in delay-200">
-                    <!-- Tugas Saya Section -->
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
                         <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                             <h3 class="font-bold text-gray-800 text-lg flex items-center">
@@ -139,7 +141,6 @@
                                                 </button>
                                             </form>
 
-                                            <!-- Mulai Pomodoro (baru) -->
                                             <button type="button"
                                                     class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-md hover:bg-indigo-700 transition font-bold shadow-sm"
                                                     data-start-pomodoro="{{ $t->id }}"
@@ -147,7 +148,6 @@
                                                 ▶ Mulai Pomodoro
                                             </button>
 
-                                            <!-- Stop Pomodoro (opsional) -->
                                             <button type="button"
                                                     class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 transition font-bold shadow-sm"
                                                     data-stop-pomodoro="{{ $t->id }}">
@@ -165,7 +165,6 @@
                         </div>
                     </div>
 
-                    <!-- Acara Seru Section -->
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
                         <div class="p-6 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                             <h3 class="font-bold text-gray-800 text-lg flex items-center">
@@ -206,7 +205,67 @@
                     </div>
                 </div>
 
-                <!-- Arsip Section -->
+                <div class="pt-8 border-t-2 border-dashed border-gray-300 animate-fade-in delay-300" id="statistik-tugas">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        📊 Statistik Tugas & Laporan
+                    </h2>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-indigo-100 shadow-md col-span-1">
+                            <h4 class="font-bold text-indigo-600 uppercase text-sm mb-4 tracking-wider">Statistik Penyelesaian Tugas</h4>
+                            
+                            <div class="flex items-center justify-center space-x-6">
+                                <div class="relative w-28 h-28">
+                                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                                        <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50"/>
+                                        <circle class="text-indigo-500 progress-ring__circle"
+                                                stroke-width="8" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50"
+                                                stroke-dasharray="282.7" 
+                                                stroke-dashoffset="{{ 282.7 - (isset($completion_percentage) ? ($completion_percentage * 2.827) : 0) }}"/>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span class="text-2xl font-bold text-indigo-700">{{ isset($completion_percentage) ? $completion_percentage : 0 }}%</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <p class="text-sm text-gray-600">Total Tugas: <span class="font-bold text-gray-800">{{ isset($total_tugas) ? $total_tugas : (count($tugas) + count($riwayat_tugas)) }}</span></p>
+                                    <p class="text-sm text-gray-600">Selesai: <span class="font-bold text-green-600">{{ isset($tugas_selesai) ? $tugas_selesai : count($riwayat_tugas) }}</span></p>
+                                    <p class="text-sm text-gray-600">Pending: <span class="font-bold text-red-600">{{ isset($tugas_pending) ? $tugas_pending : count($tugas) }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-md col-span-2">
+                            <h4 class="font-bold text-emerald-600 uppercase text-sm mb-4 tracking-wider">Laporan Bulanan Tugas Selesai</h4>
+                            
+                            @if(isset($monthly_report) && count($monthly_report) > 0)
+                                <div class="h-48 flex items-end justify-around p-2 bg-gray-50 rounded-lg">
+                                    @php
+                                        $max_tasks = max(array_values($monthly_report));
+                                        $months = array_keys($monthly_report);
+                                    @endphp
+                                    @foreach($monthly_report as $month => $count)
+                                        @php
+                                            $height_percent = $max_tasks > 0 ? ($count / $max_tasks) * 100 : 0;
+                                        @endphp
+                                        <div class="flex flex-col items-center group cursor-help" title="{{ $count }} tugas selesai">
+                                            <div class="w-6 bg-emerald-400 rounded-t-md hover:bg-emerald-600 transition duration-300" 
+                                                 style="height: {{ $height_percent }}%;">
+                                            </div>
+                                            <span class="text-xs text-gray-500 mt-1">{{ $month }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <p class="text-xs text-gray-400 mt-4 text-right">Data berdasarkan {{ count($monthly_report) }} bulan terakhir.</p>
+                            @else
+                                <div class="text-center py-10 opacity-70">
+                                    <p class="text-sm text-gray-500">Data laporan bulanan tidak tersedia.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <div class="pt-8 border-t-2 border-dashed border-gray-300">
                     <h2 class="text-2xl font-bold text-gray-600 mb-6 flex items-center gap-2">
                         📂 Arsip Riwayat
@@ -243,7 +302,6 @@
                     </div>
                 </div>
 
-                <!-- Footer -->
                 <div class="text-center text-gray-400 text-xs py-4">
                     &copy; {{ date('Y') }} Project Laravel by {{ $user->username }}.
                 </div>
@@ -291,4 +349,20 @@
   if(document.readyState === 'complete' || document.readyState === 'interactive') bindOnce();
   else document.addEventListener('DOMContentLoaded', bindOnce);
 })();
+
+// Fungsi untuk animasi Circular Progress Bar
+document.addEventListener('DOMContentLoaded', function() {
+    const progressCircle = document.querySelector('.progress-ring__circle');
+    if (progressCircle) {
+        const radius = progressCircle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+
+        // Nilai persentase diambil dari blade
+        const percentage = parseInt(document.querySelector('.progress-ring__circle').getAttribute('stroke-dashoffset'));
+        
+        // Offset sudah dihitung di blade, script ini hanya memastikan transisi berjalan
+        // Contoh: setProgress(percentage);
+    }
+});
 </script>
