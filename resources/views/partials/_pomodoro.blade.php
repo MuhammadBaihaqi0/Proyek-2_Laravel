@@ -1,5 +1,3 @@
-
-
 <div id="pomodoro-widget" aria-hidden="false" 
      style="position:fixed; right:18px; bottom:18px; z-index:9999; font-family:Inter,system-ui,Segoe UI, Roboto, 'Helvetica Neue', Arial; display: none;"> 
      <div id="pomodoro-card" style="width:280px; background:#ffffff; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.12); padding:14px;">
@@ -60,7 +58,7 @@
   const modeEl = document.getElementById('pom-mode');
   const timerEl = document.getElementById('pom-timer');
   const cycleEl = document.getElementById('pom-cycle');
-  const sound = document.getElementById('pom-sound');
+  const sound = document.getElementById('pom-sound'); // Perlu menambahkan tag <audio> untuk ini bekerja
   const activeTaskEl = document.getElementById('pom-active-task');
 
   const focusMinInput = document.getElementById('pom-focus-min');
@@ -100,7 +98,8 @@
   }
   function askNotificationPermission(){ if(!("Notification" in window)) return; if(Notification.permission === 'default') Notification.requestPermission(); }
   function playNotify(){
-    try{ sound.currentTime = 0; sound.play().catch(()=>{}); }catch(e){}
+    // *CATATAN: Elemen audio dengan id 'pom-sound' tidak ada di markup, jadi bagian ini mungkin gagal*
+    try{ if(sound) { sound.currentTime = 0; sound.play().catch(()=>{}); } }catch(e){}
   }
   function notify(title, body){
     try{
@@ -110,6 +109,7 @@
     }catch(e){}
     playNotify();
     const prev = document.title; let c=0;
+    // Membuat judul tab berkedip
     const id = setInterval(()=>{ document.title = (c%2===0? '🔔 '+title : prev); if(++c>4){ clearInterval(id); document.title = prev; } }, 700);
   }
 
@@ -139,9 +139,13 @@
         // *TAMBAH: Notifikasi ke backend saat fokus berakhir*
         focusEndedOnServer(state.activeTask ? state.activeTask.id : null, state.mode);
       } else {
+        // PERUBAHAN DI SINI: Ketika istirahat (short/long) selesai
+        const prevMode = state.mode; // Ambil mode istirahat sebelumnya
+        
         state.mode = 'focus';
         state.remaining = state.settings.focusMin * 60;
-        notify('Pomodoro — Istirahat selesai', 'Kembali fokus sekarang.');
+        // PANGGIL NOTIFIKASI KETIKA ISTIRAHAT SELESAI
+        notify('Pomodoro — Istirahat selesai', `Istirahat ${prevMode === 'long' ? 'panjang' : 'singkat'} berakhir. Kembali fokus sekarang.`);
       }
       state.lastTick = Date.now();
     }

@@ -253,14 +253,8 @@
 
     {{-- include pomodoro partial if not included in layout --}}
     {{-- If your layout already includes it, you can remove one of the duplicates --}}
-    @includeIf('partials._pomodoro')
+    {{-- @includeIf('partials._pomodoro') --}}
 </x-app-layout>
-
-// views/dashboard.blade.php
-
-// (Hanya bagian <script> di paling bawah yang perlu diubah)
-
-// ... (HTML dashboard di atas) ...
 
 <script>
 /* fallback event binding: pastikan tombol data-start-pomodoro ter-handle */
