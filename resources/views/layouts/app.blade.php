@@ -170,8 +170,8 @@
             justify-content: center;
             gap: 10px;
             padding: 12px 16px;
-            background: #ffe8e8;
-            color: #d32f2f;
+            background: #d32f2f;
+            color: #ffffff;
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -182,6 +182,7 @@
         }
         
         .logout-btn:hover {
+            color: #8b8ba3;
             background: #ffd1d1;
             transform: translateX(4px);
         }
@@ -214,18 +215,6 @@
                 <a href="/dashboard" class="sidebar-item active">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path></svg>
                     Dashboard
-                </a>
-                <a href="/tugas" class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v2h2v-2zm0 4H7v2h2v-2zm4-4h-2v2h2v-2zm0 4h-2v2h2v-2zm4-4h-2v2h2v-2zm0 4h-2v2h2v-2zm2-12H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"></path></svg>
-                    Tugas Saya
-                </a>
-                <a href="/acara" class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path></svg>
-                    Acara Saya
-                </a>
-                <a href="/arsip" class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5c-2.49 0-4.5-2.01-4.5-4.5s2.01-4.5 4.5-4.5 4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"></path></svg>
-                    Arsip
                 </a>
             </div>
             
