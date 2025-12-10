@@ -140,8 +140,8 @@
                         <div
                             class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-pink-500 flex items-center justify-between hover:shadow-md transition">
                             <div>
-                                <p class="text-xs text-gray-500 font-bold uppercase">Bulan Ini</p>
-                                <p class="text-lg font-bold text-gray-800">{{ date('F') }}</p>
+                                   <p class="text-xs text-gray-500 font-bold uppercase">Bulan Ini</p>
+                                <p class="text-lg font-bold text-gray-800">{{ \Carbon\Carbon::now()->translatedFormat('F') }}</p>
                             </div>
                             <div class="p-3 bg-pink-50 rounded-lg text-pink-500 text-xl">📅</div>
                         </div>
