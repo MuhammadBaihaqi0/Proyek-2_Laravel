@@ -66,9 +66,11 @@ class DashboardController extends Controller
     public function indexAnalytics(Request $request)
     {
         $routeName = $request->route()->getName();
+        $user = Auth::user();
         
+        // --- LOGIKA UNTUK STATISTIK TUGAS ---
         if ($routeName === 'statistik.tugas') {
-            $user = Auth::user();
+            // ... (Kode pengambilan data Statistik Tugas yang sudah dibuat sebelumnya) ...
             
             // 1. Ambil data Tugas Selesai per Bulan untuk 6 Bulan Terakhir
             $tasksPerMonth = Tugas::select(
@@ -105,21 +107,29 @@ class DashboardController extends Controller
             return view('analytics.statistik', [
                 'labels' => $labels,
                 'dataCount' => $dataCount,
-                'totalSelesai' => $totalSelesai, // Total keseluruhan yang sudah selesai
+                'totalSelesai' => $totalSelesai, 
                 'totalAktif' => $totalAktif,
-                'avgTime' => $avgTime, // Menggunakan strip (-)
+                'avgTime' => $avgTime, 
             ]);
-        }
-        // Untuk rute lainnya, kembalikan ke dashboard dengan pesan (sementara)
-        else {
-            $title = '';
-            if ($routeName === 'laporan.bulanan') {
-                $title = 'Laporan Bulanan';
-            } elseif ($routeName === 'progress.overview') {
-                $title = 'Progress Overview';
-            }
+        } 
+        
+        // --- LOGIKA BARU UNTUK LAPORAN BULANAN ---
+        elseif ($routeName === 'laporan.bulanan') {
+            // Di sini Anda dapat mengambil data summary bulanan (opsional)
             
-            return redirect()->route('dashboard')->with('info', "Halaman '{$title}' belum dibuat. Klik 'Statistik Tugas' untuk melihat halaman kerangka.");
+            return view('analytics.laporan_bulanan');
+        }
+        
+        // --- LOGIKA BARU UNTUK PROGRESS OVERVIEW ---
+        elseif ($routeName === 'progress.overview') {
+            // Di sini Anda dapat mengambil data kumulatif (opsional)
+            
+            return view('analytics.progress_overview');
+        }
+        
+        // --- DEFAULT FALLBACK (Seharusnya tidak tercapai karena semua rute analytics sudah ditangani) ---
+        else {
+            return redirect()->route('dashboard')->with('error', "Rute analytics tidak dikenal.");
         }
     }
 }
