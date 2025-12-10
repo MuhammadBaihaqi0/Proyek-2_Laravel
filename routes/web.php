@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TugasController;
 use App\Http\Controllers\AcaraController;
 use App\Http\Controllers\PomodoroController;
+use App\Http\Controllers\PasswordController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -19,6 +20,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-password', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('/change-password', [PasswordController::class, 'update'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
