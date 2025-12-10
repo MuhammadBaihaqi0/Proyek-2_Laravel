@@ -52,10 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/statistik-tugas', [DashboardController::class, 'indexAnalytics'])->name('statistik.tugas');
     Route::get('/laporan-bulanan', [DashboardController::class, 'indexAnalytics'])->name('laporan.bulanan');
     Route::get('/progress-overview', [DashboardController::class, 'indexAnalytics'])->name('progress.overview');
-// END: RUTE BARU UNTUK ANALITIK
+    // END: RUTE BARU UNTUK ANALITIK
 });
 
-Route::middleware('auth')->group(function(){
+Route::middleware('auth')->group(function () {
     Route::post('/pomodoro/start', [PomodoroController::class, 'start']);
     Route::post('/pomodoro/finish', [PomodoroController::class, 'finish']);
     Route::post('/pomodoro/focus-ended', [PomodoroController::class, 'focusEnded']);
