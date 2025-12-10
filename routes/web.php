@@ -7,6 +7,7 @@ use App\Http\Controllers\TugasController;
 use App\Http\Controllers\AcaraController;
 use App\Http\Controllers\PomodoroController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -45,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('tugas', TugasController::class);
     Route::resource('acara', AcaraController::class);
     Route::patch('/tugas/{id}/selesai', [TugasController::class, 'selesai'])->name('tugas.selesai');
-    //Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard_admin');
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard_admin');
 
     // START: RUTE BARU UNTUK ANALITIK
     Route::get('/statistik-tugas', [DashboardController::class, 'indexAnalytics'])->name('statistik.tugas');
