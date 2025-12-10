@@ -46,6 +46,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('acara', AcaraController::class);
     Route::patch('/tugas/{id}/selesai', [TugasController::class, 'selesai'])->name('tugas.selesai');
     //Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard_admin');
+
+    // START: RUTE BARU UNTUK ANALITIK
+    Route::get('/statistik-tugas', [DashboardController::class, 'indexAnalytics'])->name('statistik.tugas');
+    Route::get('/laporan-bulanan', [DashboardController::class, 'indexAnalytics'])->name('laporan.bulanan');
+    Route::get('/progress-overview', [DashboardController::class, 'indexAnalytics'])->name('progress.overview');
+// END: RUTE BARU UNTUK ANALITIK
 });
 
 Route::middleware('auth')->group(function(){

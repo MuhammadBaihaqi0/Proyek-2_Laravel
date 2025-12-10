@@ -291,6 +291,45 @@
             </div>
         </div>
 
+        <div class="pt-8 border-t-2 border-dashed border-gray-300">
+                        <h2 class="text-2xl font-bold text-gray-600 mb-6 flex items-center gap-2">
+                            📈 Ringkasan Produktivitas Bulan Ini
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-200 shadow-md">
+                                <h4 class="font-bold text-indigo-700 uppercase text-xs mb-3 tracking-wider flex items-center gap-1">
+                                    <span class="text-lg">✅</span> Tugas Selesai (Total)
+                                </h4>
+                                <p class="text-4xl font-extrabold text-indigo-900">{{ count($riwayat_tugas) }}</p>
+                                <p class="text-sm text-indigo-600 mt-2">Lihat semua di <a href="{{ route('statistik.tugas') }}" class="font-bold hover:underline">Statistik Tugas</a></p>
+                            </div>
+
+                            <div class="bg-emerald-50 p-6 rounded-2xl border border-emerald-200 shadow-md">
+                                <h4 class="font-bold text-emerald-700 uppercase text-xs mb-3 tracking-wider flex items-center gap-1">
+                                    <span class="text-lg">🗓️</span> Acara Mendatang
+                                </h4>
+                                <p class="text-4xl font-extrabold text-emerald-900">{{ count($acara) }}</p>
+                                <p class="text-sm text-emerald-600 mt-2">Rencanakan agenda penting!</p>
+                            </div>
+                            
+                            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-200 shadow-md">
+                                <h4 class="font-bold text-pink-700 uppercase text-xs mb-3 tracking-wider flex items-center gap-1">
+                                    <span class="text-lg">🔥</span> Status Tugas Aktif
+                                </h4>
+                                @php
+                                    $totalTugas = count($riwayat_tugas) + count($tugas);
+                                    $ratio = $totalTugas > 0 ? round((count($riwayat_tugas) / $totalTugas) * 100) : 0;
+                                @endphp
+                                <p class="text-4xl font-extrabold text-pink-900">{{ count($tugas) }}</p>
+                                <p class="text-sm text-pink-600 mt-2">Tugas aktif. Persentase selesai: <span class="font-bold">{{ $ratio }}%</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
             <div class="text-center text-gray-500 text-xs">
                 &copy; {{ date('Y') }} Project Laravel by <span class="font-bold text-indigo-600">{{ $user->username }}</span>.
