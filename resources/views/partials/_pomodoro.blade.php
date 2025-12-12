@@ -117,7 +117,7 @@
   function tick(){
     if(!state.lastTick) state.lastTick = Date.now();
     const now = Date.now();
-    const elapsed = Math.floor((now - state.lastTick)/1000);
+    const elapsed = Math.floor((now - state.lastTick) / 1000);
     if(!state.paused){
       state.remaining = Math.max(0, state.remaining - elapsed);
       state.lastTick = now;
