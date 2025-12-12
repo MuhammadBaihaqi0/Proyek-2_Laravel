@@ -50,6 +50,18 @@
                             <p class="text-3xl font-extrabold text-emerald-800 mt-2">{{ $acaraBulanIni->count() }}</p>
                         </div>
                     </div>
+                    <div class="mt-8 p-6 bg-yellow-50 rounded-xl border-l-4 border-yellow-500 shadow-md">
+                        <div class="flex items-center mb-3">
+                            <span class="text-3xl mr-3">{{ $iconKesimpulan }}</span>
+                            <h4 class="text-xl font-bold text-yellow-800">
+                                Analisis Bulan Ini: <span class="text-2xl text-yellow-900">{{ $kesimpulan }}</span>
+                            </h4>
+                        </div>
+                        <p class="text-yellow-700 mt-2 border-t border-yellow-200 pt-2">
+                            Saran Tindakan : {{ $saran }}
+                        </p>
+                    </div>
+                    <div class="mt-8 p-6 bg-white border border-gray-200 rounded-xl shadow-md">
 
                     <div class="mt-8 p-6 bg-white border border-gray-200 rounded-xl shadow-md">
                         <h4 class="text-xl font-bold text-gray-700 mb-4">Detail Tugas dan Acara Bulan Ini</h4>
@@ -58,7 +70,9 @@
                             <div class="py-10 text-center text-gray-500 italic">
                                 Tidak ada tugas yang diselesaikan atau acara yang dihadiri pada {{ $currentMonthYear }}.
                             </div>
+                            
                         @else
+                        
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <h5 class="font-bold text-green-700 mb-2 border-b pb-1">Tugas Selesai ({{ $tugasSelesaiBulanIni->count() }})</h5>

@@ -62,18 +62,6 @@ class DashboardController extends Controller
     }
 
     // Method untuk halaman analitik
-    
-    // File: DashboardController.php
-
-// ... pastikan import ini ada:
-// use App\Models\Tugas;
-// use App\Models\Acara;
-// use Carbon\Carbon;
-// use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\DB; 
-
-// ...
-
     public function indexAnalytics(Request $request, $year = null, $month = null)
     {
         Carbon::setLocale('id'); // Pastikan nama bulan dalam Bahasa Indonesia
@@ -113,27 +101,25 @@ class DashboardController extends Controller
             return view('analytics.statistik', compact('labels', 'dataCount', 'totalSelesai', 'totalAktif', 'avgTime'));
         } 
         
-        // --- LOGIKA BARU UNTUK LAPORAN BULANAN (BULAN SAAT INI) ---
+        // --- LOGIKA UNTUK LAPORAN BULANAN (DIPERBARUI DENGAN KESIMPULAN) ---
         elseif ($routeName === 'laporan.bulanan') {
-    
-    // Tentukan Bulan yang digunakan, default ke bulan saat ini jika parameter kosong
-    
-    // Perbaikan: Gunakan Carbon::parse untuk membuat tanggal dari string atau gunakan Carbon::now()
-    if ($year && $month) {
-        // Coba buat tanggal dari YYYY-MM-01
-        $targetDate = Carbon::parse("{$year}-{$month}-01");
-    } else {
-        // Jika tidak ada parameter, gunakan bulan saat ini
-        $targetDate = Carbon::now();
-    }
-    
-    $startOfMonth = $targetDate->startOfMonth()->toDateString();
-    $endOfMonth = $targetDate->endOfMonth()->toDateString();
-    
-    // Data Bulan dan Tahun saat ini
-    $currentMonthYear = $targetDate->isoFormat('MMMM Y');
-    $selectedYear = $targetDate->year;
-    $selectedMonth = $targetDate->month;
+            
+            // Tentukan Bulan yang digunakan, default ke bulan saat ini jika parameter kosong
+            if ($year && $month) {
+                // Coba buat tanggal dari YYYY-MM-01
+                $targetDate = Carbon::parse("{$year}-{$month}-01");
+            } else {
+                // Jika tidak ada parameter, gunakan bulan saat ini
+                $targetDate = Carbon::now();
+            }
+            
+            $startOfMonth = $targetDate->startOfMonth()->toDateString();
+            $endOfMonth = $targetDate->endOfMonth()->toDateString();
+            
+            // Data Bulan dan Tahun saat ini
+            $currentMonthYear = $targetDate->isoFormat('MMMM Y');
+            $selectedYear = $targetDate->year;
+            $selectedMonth = $targetDate->month;
             
             // 1. Total Tugas dibuat
             $totalTugasBulanIni = $user->tugas()
@@ -145,20 +131,59 @@ class DashboardController extends Controller
                 ->where('status', 'selesai')
                 ->whereBetween('updated_at', [$startOfMonth, $endOfMonth])
                 ->orderBy('updated_at', 'desc')
-                ->get(); // Ambil koleksi untuk ditampilkan di detail
+                ->get();
 
             // 3. Total Acara, termasuk detailnya
             $acaraBulanIni = $user->acara()
                 ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                 ->orderBy('tanggal', 'asc')
-                ->get(); // Ambil koleksi untuk ditampilkan di detail
+                ->get();
 
             // 4. Hitung Rasio
             $rasioPenyelesaianBulanIni = ($totalTugasBulanIni > 0) 
                 ? round(($tugasSelesaiBulanIni->count() / $totalTugasBulanIni) * 100) 
                 : 0;
 
-            // 5. Generate Bulan yang Tersedia (HANYA bulan yang memiliki data)
+            // 5. LOGIKA KESIMPULAN PRODUKTIVITAS
+            $kesimpulan = '';
+            $saran = '';
+            $iconKesimpulan = '';
+            
+            $rasio = $rasioPenyelesaianBulanIni;
+            $totalTugas = $totalTugasBulanIni;
+            $totalAcara = $acaraBulanIni->count();
+
+            if ($totalTugas === 0 && $totalAcara === 0) {
+                $iconKesimpulan = '😴';
+                $kesimpulan = 'Sangat Santai';
+                $saran = 'Bulan ini sangat sepi. Ayo segera tentukan agenda atau buat tugas baru untuk memaksimalkan waktu Anda!';
+            } elseif ($rasio >= 90 && $totalTugas >= 10) {
+                $iconKesimpulan = '👑';
+                $kesimpulan = 'Produktivitas Juara!';
+                $saran = 'Pertahankan performa luar biasa ini! Anda efisien dan mampu menyelesaikan hampir semua target.';
+            } elseif ($rasio >= 70 && $totalTugas >= 5) {
+                $iconKesimpulan = '💪';
+                $kesimpulan = 'Sangat Produktif';
+                $saran = 'Kinerja yang baik! Sedikit dorongan lagi untuk mencapai tingkat penyelesaian sempurna.';
+            } elseif ($rasio >= 50) {
+                $iconKesimpulan = '🧐';
+                $kesimpulan = 'Cukup Produktif';
+                $saran = 'Progres Anda lumayan, tetapi banyak tugas yang tertinggal. Coba identifikasi penyebab penundaan.';
+            } elseif ($rasio > 0 && $rasio < 50) {
+                $iconKesimpulan = '🐌';
+                $kesimpulan = 'Kurang Produktif';
+                $saran = 'Rasio penyelesaian Anda rendah. Fokus pada prioritas dan batasi gangguan non-esensial.';
+            } elseif ($totalTugas === 0 && $totalAcara > 3) {
+                $iconKesimpulan = '🥳';
+                $kesimpulan = 'Kebanyakan Nongkrong';
+                $saran = 'Bulan ini penuh kegiatan sosial/hiburan, tetapi nol tugas. Seimbangkan kesenangan dan kewajiban!';
+            } else {
+                $iconKesimpulan = '⚠️';
+                $kesimpulan = 'Perlu Perhatian';
+                $saran = 'Tidak ada data tugas yang dapat dianalisis secara efektif. Mulai kembali dengan tugas kecil untuk membangun momentum.';
+            }
+            
+            // 6. Generate Bulan yang Tersedia (HANYA bulan yang memiliki data)
             $uniqueMonths = collect();
 
             // Ambil bulan unik dari tabel tugas
@@ -209,7 +234,6 @@ class DashboardController extends Controller
                 ]);
             }
 
-            // ... (sisa return view tetap sama)
             return view('analytics.laporan_bulanan', compact(
                 'totalTugasBulanIni', 
                 'tugasSelesaiBulanIni', 
@@ -218,9 +242,13 @@ class DashboardController extends Controller
                 'currentMonthYear',
                 'selectedYear',
                 'selectedMonth',
-                'availableMonths' // Pilihan bulan baru
+                'availableMonths',
+                'kesimpulan',    // <-- Variabel Baru
+                'saran',         // <-- Variabel Baru
+                'iconKesimpulan' // <-- Variabel Baru
             ));
         }
+        
         // --- LOGIKA BARU UNTUK PROGRESS OVERVIEW (KUMULATIF 12 BULAN) ---
         elseif ($routeName === 'progress.overview') {
             
