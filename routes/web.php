@@ -49,8 +49,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard_admin');
 
     // START: RUTE BARU UNTUK ANALITIK
+    Route::get('/laporan-bulanan/{year?}/{month?}', [DashboardController::class, 'indexAnalytics'])->name('laporan.bulanan');
     Route::get('/statistik-tugas', [DashboardController::class, 'indexAnalytics'])->name('statistik.tugas');
-    Route::get('/laporan-bulanan', [DashboardController::class, 'indexAnalytics'])->name('laporan.bulanan');
     Route::get('/progress-overview', [DashboardController::class, 'indexAnalytics'])->name('progress.overview');
     // END: RUTE BARU UNTUK ANALITIK
 });
