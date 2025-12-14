@@ -62,77 +62,75 @@ class DashboardController extends Controller
     }
 
     // Method untuk halaman analitik
-
+    
     public function indexAnalytics(Request $request)
     {
+        Carbon::setLocale('id'); // Pastikan nama bulan dalam Bahasa Indonesia
         $routeName = $request->route()->getName();
         $user = Auth::user();
-        Carbon::setLocale('id');
-
-        // ================= STATISTIK TUGAS =================
+        
+        // --- LOGIKA UNTUK STATISTIK TUGAS ---
         if ($routeName === 'statistik.tugas') {
-
-            // 1️⃣ Grafik: Tugas Selesai per Bulan (6 Bulan Terakhir)
+            // ... (Kode pengambilan data Statistik Tugas yang sudah dibuat sebelumnya) ...
+            
+            // 1. Ambil data Tugas Selesai per Bulan untuk 6 Bulan Terakhir
+            $tasksPerMonth = Tugas::select(
+                DB::raw('MONTH(updated_at) as month'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->where('user_id', $user->id)
+            ->where('status', 'selesai')
+            ->where('updated_at', '>=', Carbon::now()->subMonths(6))
+            ->groupBy('month')
+            ->orderBy('month', 'asc')
+            ->get();
+            
+            // 2. Format Data untuk Grafik
             $labels = [];
             $dataCount = [];
 
             for ($i = 5; $i >= 0; $i--) {
-                $bulan = Carbon::now()->subMonths($i);
-
-                $labels[] = $bulan->translatedFormat('M');
-
-                $jumlah = Tugas::where('user_id', $user->id)
-                    ->where('status', 'selesai')
-                    ->whereYear('updated_at', $bulan->year)
-                    ->whereMonth('selesai_pada', $bulan->month)
-                    ->count();
-
-                $dataCount[] = $jumlah;
+                $monthName = Carbon::now()->subMonths($i)->format('M');
+                $monthNumber = Carbon::now()->subMonths($i)->month; 
+                $labels[] = $monthName;
+                
+                $found = $tasksPerMonth->firstWhere('month', $monthNumber);
+                $dataCount[] = $found ? $found->total : 0;
             }
 
-            // 2️⃣ Ringkasan
-            $totalSelesai = $user->tugas()
-                ->where('status', 'selesai')
-                ->count();
-
-            $totalAktif = $user->tugas()
-                ->where('status', '!=', 'selesai')
-                ->count();
-
-            // 3️⃣ Waktu Rata-rata Penyelesaian (MENIT)
-            $durasi = Tugas::where('user_id', $user->id)
-                ->where('status', 'selesai')
-                ->whereNotNull('selesai_pada')
-                ->get()
-                ->map(function ($tugas) {
-                    return Carbon::parse($tugas->created_at)
-                        ->diffInMinutes(Carbon::parse($tugas->selesai_pada));
-                });
-
-            $avgTime = $durasi->count()
-                ? round($durasi->avg()) . ' menit'
-                : '-';
+            // 3. Ambil Data Ringkasan
+            $totalSelesai = $user->tugas()->where('status', 'selesai')->count();
+            $totalAktif = $user->tugas()->where('status', '!=', 'selesai')->count();
+            
+            // Data Waktu Rata-rata: Ganti N/A menjadi "-"
+            $avgTime = "-"; 
 
             return view('analytics.statistik', [
-                'labels'        => $labels,
-                'dataCount'     => $dataCount,
-                'totalSelesai'  => $totalSelesai,
-                'totalAktif'    => $totalAktif,
-                'avgTime'       => $avgTime,
+                'labels' => $labels,
+                'dataCount' => $dataCount,
+                'totalSelesai' => $totalSelesai, 
+                'totalAktif' => $totalAktif,
+                'avgTime' => $avgTime, 
             ]);
-        }
-
-        // ================= LAPORAN BULANAN =================
+        } 
+        
+        // --- LOGIKA BARU UNTUK LAPORAN BULANAN ---
         elseif ($routeName === 'laporan.bulanan') {
+            // Di sini Anda dapat mengambil data summary bulanan (opsional)
+            
             return view('analytics.laporan_bulanan');
         }
-
-        // ================= PROGRESS OVERVIEW =================
+        
+        // --- LOGIKA BARU UNTUK PROGRESS OVERVIEW ---
         elseif ($routeName === 'progress.overview') {
+            // Di sini Anda dapat mengambil data kumulatif (opsional)
+            
             return view('analytics.progress_overview');
         }
-
-        return redirect()->route('dashboard')
-            ->with('error', 'Rute analytics tidak dikenal.');
+        
+        // --- DEFAULT FALLBACK (Seharusnya tidak tercapai karena semua rute analytics sudah ditangani) ---
+        else {
+            return redirect()->route('dashboard')->with('error', "Rute analytics tidak dikenal.");
+        }
     }
 }
