@@ -11,31 +11,51 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    /**
+     * ===============================
+     * DASHBOARD UTAMA
+     * ===============================
+     */
     public function index()
     {
         Carbon::setLocale('id');
-        $tanggalHariIni = Carbon::now()->isoFormat('dddd, D MMMM Y');
+
         $user = Auth::user();
+        $tanggalHariIni = Carbon::now()->translatedFormat('l, d F Y');
 
         // Avatar
-        $avatar_path = $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($user->username) . '&background=random&color=ffffff&size=128&bold=true';
+        $avatar_path = $user->avatar
+            ? asset('storage/' . $user->avatar)
+            : 'https://ui-avatars.com/api/?name=' . urlencode($user->username) . '&background=random&color=ffffff&size=128&bold=true';
 
-        // 1. TUGAS AKTIF (Belum Selesai)
-        $tugas_aktif = $user->tugas()->where('status', '!=', 'selesai')->orderBy('deadline', 'asc')->get();
+        // Tugas Aktif
+        $tugas_aktif = $user->tugas()
+            ->where('status', '!=', 'selesai')
+            ->orderBy('deadline', 'asc')
+            ->get();
 
-        // 2. TUGAS RIWAYAT (Selesai)
-        $tugas_riwayat = $user->tugas()->where('status', 'selesai')->orderBy('updated_at', 'desc')->get();
+        // Tugas Selesai
+        $tugas_riwayat = $user->tugas()
+            ->where('status', 'selesai')
+            ->orderBy('selesai_pada', 'desc')
+            ->get();
 
-        // 3. ACARA AKTIF (Mendatang)
-        $acara_aktif = $user->acara()->where('tanggal', '>=', now()->toDateString())->orderBy('tanggal', 'asc')->get();
+        // Acara Mendatang
+        $acara_aktif = $user->acara()
+            ->where('tanggal', '>=', now())
+            ->orderBy('tanggal', 'asc')
+            ->get();
 
-        // 4. ACARA RIWAYAT (Lewat)
-        $acara_riwayat = $user->acara()->where('tanggal', '<', now()->toDateString())->orderBy('tanggal', 'desc')->get();
+        // Acara Terlewat
+        $acara_riwayat = $user->acara()
+            ->where('tanggal', '<', now())
+            ->orderBy('tanggal', 'desc')
+            ->get();
 
-        // Greeting logic
-        $hour = date('H');
+        // Greeting
+        $hour = now()->hour;
         if ($hour >= 5 && $hour < 12) {
-            $greeting = 'Hi kamu';
+            $greeting = 'Selamat Pagi';
             $icon = '☀️';
         } elseif ($hour >= 12 && $hour < 15) {
             $greeting = 'Selamat Siang';
@@ -53,84 +73,92 @@ class DashboardController extends Controller
             'user'           => $user,
             'avatar_path'    => $avatar_path,
             'tugas'          => $tugas_aktif,
-            'riwayat_tugas'  => $tugas_riwayat, // <-- Data Penting
+            'riwayat_tugas'  => $tugas_riwayat,
             'acara'          => $acara_aktif,
-            'riwayat_acara'  => $acara_riwayat, // <-- Data Penting
+            'riwayat_acara'  => $acara_riwayat,
             'greeting'       => $greeting,
-            'icon'           => $icon
+            'icon'           => $icon,
         ]);
     }
 
-    // Method untuk halaman analitik
-    
+    /**
+     * ===============================
+     * ANALYTICS / STATISTIK
+     * ===============================
+     */
     public function indexAnalytics(Request $request)
     {
-        Carbon::setLocale('id'); // Pastikan nama bulan dalam Bahasa Indonesia
-        $routeName = $request->route()->getName();
+        Carbon::setLocale('id');
+
         $user = Auth::user();
-        
-        // --- LOGIKA UNTUK STATISTIK TUGAS ---
+        $routeName = $request->route()->getName();
+
+        /**
+         * ===============================
+         * STATISTIK TUGAS
+         * ===============================
+         */
         if ($routeName === 'statistik.tugas') {
-            // ... (Kode pengambilan data Statistik Tugas yang sudah dibuat sebelumnya) ...
-            
-            // 1. Ambil data Tugas Selesai per Bulan untuk 6 Bulan Terakhir
-            $tasksPerMonth = Tugas::select(
-                DB::raw('MONTH(updated_at) as month'),
-                DB::raw('COUNT(*) as total')
-            )
-            ->where('user_id', $user->id)
-            ->where('status', 'selesai')
-            ->where('updated_at', '>=', Carbon::now()->subMonths(6))
-            ->groupBy('month')
-            ->orderBy('month', 'asc')
-            ->get();
-            
-            // 2. Format Data untuk Grafik
+
             $labels = [];
             $dataCount = [];
 
             for ($i = 5; $i >= 0; $i--) {
-                $monthName = Carbon::now()->subMonths($i)->format('M');
-                $monthNumber = Carbon::now()->subMonths($i)->month; 
-                $labels[] = $monthName;
-                
-                $found = $tasksPerMonth->firstWhere('month', $monthNumber);
-                $dataCount[] = $found ? $found->total : 0;
+                $bulan = Carbon::now()->subMonths($i);
+
+                $labels[] = $bulan->translatedFormat('M Y');
+
+                $jumlah = Tugas::where('user_id', $user->id)
+                    ->where('status', 'selesai')
+                    ->whereYear('selesai_pada', $bulan->year)
+                    ->whereMonth('selesai_pada', $bulan->month)
+                    ->count();
+
+                $dataCount[] = $jumlah;
             }
 
-            // 3. Ambil Data Ringkasan
+            // Ringkasan
             $totalSelesai = $user->tugas()->where('status', 'selesai')->count();
-            $totalAktif = $user->tugas()->where('status', '!=', 'selesai')->count();
-            
-            // Data Waktu Rata-rata: Ganti N/A menjadi "-"
-            $avgTime = "-"; 
+            $totalAktif   = $user->tugas()->where('status', '!=', 'selesai')->count();
+
+            // Rata-rata waktu pengerjaan (menit)
+            $avgMinutes = $user->tugas()
+                ->where('status', 'selesai')
+                ->whereNotNull('selesai_pada')
+                ->select(DB::raw('AVG(TIMESTAMPDIFF(MINUTE, created_at, selesai_pada)) as avg'))
+                ->value('avg');
+
+            $avgTime = $avgMinutes
+                ? round($avgMinutes / 60, 1) . ' jam'
+                : '-';
 
             return view('analytics.statistik', [
-                'labels' => $labels,
-                'dataCount' => $dataCount,
-                'totalSelesai' => $totalSelesai, 
-                'totalAktif' => $totalAktif,
-                'avgTime' => $avgTime, 
+                'labels'        => $labels,
+                'dataCount'     => $dataCount,
+                'totalSelesai'  => $totalSelesai,
+                'totalAktif'    => $totalAktif,
+                'avgTime'       => $avgTime,
             ]);
-        } 
-        
-        // --- LOGIKA BARU UNTUK LAPORAN BULANAN ---
-        elseif ($routeName === 'laporan.bulanan') {
-            // Di sini Anda dapat mengambil data summary bulanan (opsional)
-            
+        }
+
+        /**
+         * ===============================
+         * LAPORAN BULANAN
+         * ===============================
+         */
+        if ($routeName === 'laporan.bulanan') {
             return view('analytics.laporan_bulanan');
         }
-        
-        // --- LOGIKA BARU UNTUK PROGRESS OVERVIEW ---
-        elseif ($routeName === 'progress.overview') {
-            // Di sini Anda dapat mengambil data kumulatif (opsional)
-            
+
+        /**
+         * ===============================
+         * PROGRESS OVERVIEW
+         * ===============================
+         */
+        if ($routeName === 'progress.overview') {
             return view('analytics.progress_overview');
         }
-        
-        // --- DEFAULT FALLBACK (Seharusnya tidak tercapai karena semua rute analytics sudah ditangani) ---
-        else {
-            return redirect()->route('dashboard')->with('error', "Rute analytics tidak dikenal.");
-        }
+
+        return redirect()->route('dashboard');
     }
 }
