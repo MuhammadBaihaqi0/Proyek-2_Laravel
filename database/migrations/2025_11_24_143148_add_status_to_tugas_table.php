@@ -14,7 +14,9 @@ class AddStatusToTugasTable extends Migration
     public function up(): void
     {
         Schema::table('tugas', function (Blueprint $table) {
-            $table->string('status')->default('pending'); // Kolom baru default 'pending'
+            if (!Schema::hasColumn('tugas', 'status')) {
+                $table->string('status')->default('pending');
+            }
         });
     }
     /**

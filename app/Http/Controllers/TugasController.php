@@ -104,10 +104,12 @@ class TugasController extends Controller
     // Fungsi untuk menandai tugas selesai
     public function selesai($id)
     {
-        $tugas = \App\Models\Tugas::findOrFail($id);
+        $tugas = Tugas::findOrFail($id);
+
         $tugas->status = 'selesai';
+        $tugas->selesai_pada = now(); // ⬅️ INI KUNCI
         $tugas->save();
 
-        return redirect()->back()->with('success', 'Tugas selesai!');
+        return redirect()->back()->with('success', 'Tugas diselesaikan');
     }
 }

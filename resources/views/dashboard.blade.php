@@ -140,8 +140,9 @@
                         <div
                             class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-pink-500 flex items-center justify-between hover:shadow-md transition">
                             <div>
-                                   <p class="text-xs text-gray-500 font-bold uppercase">Bulan Ini</p>
-                                <p class="text-lg font-bold text-gray-800">{{ \Carbon\Carbon::now()->translatedFormat('F') }}</p>
+                                <p class="text-xs text-gray-500 font-bold uppercase">Acara Selesai</p>
+                                <p class="text-lg font-bold text-gray-800">
+                                    {{count($riwayat_acara) }}</p>
                             </div>
                             <div class="p-3 bg-pink-50 rounded-lg text-pink-500 text-xl">📅</div>
                         </div>
@@ -169,9 +170,10 @@
                                             class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm"
                                             placeholder="Mau ngerjain apa?" required>
                                         <div class="flex gap-2">
-                                            <input type="date" name="deadline"
+                                            <input type="text" name="deadline" id="deadline"
                                                 class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm text-gray-600"
-                                                required>
+                                                placeholder="Pilih tanggal & jam" required>
+
                                             <button type="submit"
                                                 class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">+</button>
                                         </div>
@@ -181,22 +183,23 @@
                                 <div class="space-y-3 max-h-[350px] overflow-y-auto no-scrollbar pr-1">
                                     @forelse($tugas as $t)
                                         <div
-                                            class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg shadow-sm hover:border-indigo-300 hover:shadow-md transition group">
+                                            class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 bg-white border border-gray-100 rounded-lg shadow-sm hover:border-indigo-300 hover:shadow-md transition group">
                                             <div class="flex items-center gap-3">
                                                 <div
                                                     class="w-2 h-2 rounded-full bg-indigo-500 group-hover:scale-125 transition">
                                                 </div>
                                                 <div>
-                                                    <p class="font-semibold text-gray-800 text-sm">{{ $t->nama_tugas }}
+                                                    <p class="font-semibold text-gray-800 text-sm break-words">
+                                                        {{ $t->nama_tugas }}
                                                     </p>
                                                     <p class="text-xs text-red-500">
                                                         Deadline:
-                                                        {{ \Carbon\Carbon::parse($t->deadline)->translatedFormat('l, d F Y') }}
+                                                        {{ \Carbon\Carbon::parse($t->deadline)->translatedFormat('l, d F Y H:i') }}
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex flex-wrap gap-2">
                                                 <form action="{{ route('tugas.selesai', $t->id) }}" method="POST">
                                                     @csrf @method('PATCH')
                                                     <button type="submit"
@@ -205,7 +208,7 @@
                                                 </form>
 
                                                 <button type="button"
-                                                    class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-md hover:bg-indigo-700 transition font-bold shadow-sm"
+                                                    class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-md w-full md:w-auto text-center hover:bg-indigo-700 transition font-bold shadow-sm"
                                                     data-start-pomodoro="{{ $t->id }}"
                                                     data-task-title="{{ e($t->nama_tugas) }}">▶ Mulai Pomodoro</button>
 
@@ -259,9 +262,10 @@
                                             class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm"
                                             placeholder="Ada acara apa?" required>
                                         <div class="flex gap-2">
-                                            <input type="date" name="tanggal"
+                                            <input type="text" name="tanggal" id="tanggal_acara"
                                                 class="w-full border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm text-gray-600"
-                                                required>
+                                                placeholder="Pilih tanggal & jam" required>
+
                                             <button type="submit"
                                                 class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-lg text-sm font-bold shadow-md transition">+</button>
                                         </div>
@@ -271,7 +275,7 @@
                                 <div class="space-y-3 max-h-[350px] overflow-y-auto no-scrollbar pr-1">
                                     @forelse($acara as $a)
                                         <div
-                                            class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg shadow-sm hover:border-emerald-300 hover:shadow-md transition group">
+                                            class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 bg-white border border-gray-100 rounded-lg shadow-sm hover:border-emerald-300 hover:shadow-md transition group">
                                             <div class="flex items-center gap-3 overflow-hidden">
                                                 <div
                                                     class="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex flex-col items-center justify-center border border-emerald-200">
@@ -418,6 +422,30 @@
     </footer>
 
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            if (document.getElementById("deadline")) {
+                flatpickr("#deadline", {
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
+                    time_24hr: true,
+                    locale: "id"
+                });
+            }
+
+            if (document.getElementById("tanggal_acara")) {
+                flatpickr("#tanggal_acara", {
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
+                    time_24hr: true,
+                    locale: "id"
+                });
+            }
+
+        });
+    </script>
+
 </x-app-layout>
 
 <script>

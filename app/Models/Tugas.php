@@ -21,4 +21,9 @@ class Tugas extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    protected $casts = [
+        'deadline' => 'datetime',
+        'tanggal' => 'datetime',
+    ];
 }
