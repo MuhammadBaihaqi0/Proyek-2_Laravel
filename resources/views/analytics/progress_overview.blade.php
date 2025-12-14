@@ -45,6 +45,7 @@
         const chartData = @json($cumulativeData);
         
         document.addEventListener('DOMContentLoaded', function () {
+            // Pastikan Chart.js sudah dimuat (diasumsikan sudah di app.blade.php)
             const ctx = document.getElementById('cumulativeChart');
             
             const data = {
@@ -73,7 +74,7 @@
                                 text: 'Total Tugas Selesai'
                             },
                             ticks: {
-                                precision: 0 // Memastikan sumbu Y hanya menampilkan angka bulat
+                                precision: 0 
                             }
                         }
                     },

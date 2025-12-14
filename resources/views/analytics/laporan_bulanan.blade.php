@@ -76,25 +76,37 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <h5 class="font-bold text-green-700 mb-2 border-b pb-1">Tugas Selesai ({{ $tugasSelesaiBulanIni->count() }})</h5>
-                                    <ul class="space-y-2 max-h-64 overflow-y-auto no-scrollbar pr-2">
-                                        @foreach ($tugasSelesaiBulanIni as $tugas)
-                                            <li class="bg-green-50 p-3 rounded-lg text-sm flex justify-between items-center">
-                                                <span class="font-medium text-gray-700 truncate">{{ $tugas->nama_tugas }}</span>
-                                                <span class="text-xs text-green-600 font-bold flex-shrink-0 ml-2">Selesai: {{ \Carbon\Carbon::parse($tugas->updated_at)->format('d M') }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
+<ul class="space-y-2 max-h-64 overflow-y-auto no-scrollbar pr-2">
+    @foreach ($tugasSelesaiBulanIni as $tugas)
+        <li class="bg-green-50 p-3 rounded-lg text-sm flex justify-between items-center">
+            <span class="font-medium text-gray-700 truncate">{{ $tugas->nama_tugas }}</span>
+            <span class="text-xs text-green-600 font-bold flex-shrink-0 ml-2">
+                Selesai: {{ \Carbon\Carbon::parse($tugas->updated_at)->translatedFormat('d M') }} 
+            </span>
+        </li>
+    @endforeach
+</ul>
+@foreach ($tugasSelesaiBulanIni as $tugas)
+    <li class="bg-green-50 p-3 rounded-lg text-sm flex justify-between items-center">
+        <span class="font-medium text-gray-700 truncate">{{ $tugas->nama_tugas }}</span>
+        <span class="text-xs text-green-600 font-bold flex-shrink-0 ml-2">
+            Selesai: {{ \Carbon\Carbon::parse($tugas->updated_at)->translatedFormat('d M') }} 
+        </span>
+    </li>
+@endforeach
                                 </div>
                                 <div>
                                     <h5 class="font-bold text-emerald-700 mb-2 border-b pb-1">Acara Terjadwal ({{ $acaraBulanIni->count() }})</h5>
-                                    <ul class="space-y-2 max-h-64 overflow-y-auto no-scrollbar pr-2">
-                                        @foreach ($acaraBulanIni as $acara)
-                                            <li class="bg-emerald-50 p-3 rounded-lg text-sm flex justify-between items-center">
-                                                <span class="font-medium text-gray-700 truncate">{{ $acara->nama_acara }}</span>
-                                                <span class="text-xs text-emerald-600 font-bold flex-shrink-0 ml-2">Tanggal: {{ \Carbon\Carbon::parse($acara->tanggal)->format('d M') }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
+<ul class="space-y-2 max-h-64 overflow-y-auto no-scrollbar pr-2">
+    @foreach ($acaraBulanIni as $acara)
+    <li class="bg-emerald-50 p-3 rounded-lg text-sm flex justify-between items-center">
+        <span class="font-medium text-gray-700 truncate">{{ $acara->nama_acara }}</span>
+        <span class="text-xs text-emerald-600 font-bold flex-shrink-0 ml-2">
+            Tanggal: {{ \Carbon\Carbon::parse($acara->tanggal)->translatedFormat('d M') }} 
+        </span>
+    </li>
+@endforeach
+</ul>
                                 </div>
                             </div>
                         @endif
