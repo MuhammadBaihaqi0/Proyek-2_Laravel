@@ -208,24 +208,28 @@
     </style>
 </head>
 
-<body >
+<body>
     <div class="main-container">
         <aside class="sidebar">
             <!-- Header Icon -->
-            <div class="sidebar-header" title="Dashboard">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                </svg>
+            <div class="sidebar-header" style="width:auto; padding:12px 16px;">
+                <span
+                    style="
+        font-size:20px;
+        font-weight:1000;
+        color:#6366f1;
+        letter-spacing:0.5px;
+    ">
+                    Focus & Finish
+                </span>
             </div>
+
 
             <!-- Menu Utama -->
             <div class="sidebar-section">
                 <div class="sidebar-label">Menu Utama</div>
-                <a href="/dashboard" class="sidebar-item active">
+                <a href="{{ route('dashboard') }}"
+                    class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path>
                     </svg>
@@ -238,7 +242,8 @@
             <!-- Pengaturan -->
             <div class="sidebar-section">
                 <div class="sidebar-label">Pengaturan</div>
-                <a href="/profile" class="sidebar-item">
+                <a href="{{ route('profile.edit') }}"
+                    class="sidebar-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
@@ -246,7 +251,8 @@
                     </svg>
                     Edit Profil
                 </a>
-                <a href="{{ route('password.edit') }}" class="sidebar-item">
+                <a href="{{ route('password.edit') }}"
+                    class="sidebar-item {{ request()->routeIs('password.*') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M18 8h-1V6c0-2.76-2.24-5-5-5s-5 2.24-5 5v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-4 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z">
@@ -258,25 +264,18 @@
 
             <div class="sidebar-divider"></div>
 
-            <!-- Tema & Tampilan -->
-            {{-- <div class="sidebar-section">
-                <div class="sidebar-label">Tema & Tampilan</div>
-                <div class="theme-toggle">
-                    <button class="theme-btn active">Terang</button>
-                    <button class="theme-btn">Gelap</button>
-                </div>
-            </div> --}}
-
             <!-- Analitik -->
             <div class="sidebar-section">
                 <div class="sidebar-label">Analitik</div>
-                <a href="{{ route('statistik.tugas') }}" class="sidebar-item">
+                <a href="{{ route('statistik.tugas') }}"
+                    class="sidebar-item {{ request()->routeIs('statistik.tugas') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"></path>
                     </svg>
                     Statistik Tugas
                 </a>
-                <a href="{{ route('laporan.bulanan') }}" class="sidebar-item">
+                <a href="{{ route('laporan.bulanan') }}"
+                    class="sidebar-item {{ request()->routeIs('laporan.bulanan') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2V17zm4 0h-2V7h2V17zm4 0h-2v-4h2V17z">
@@ -284,7 +283,8 @@
                     </svg>
                     Laporan Bulanan
                 </a>
-                <a href="{{ route('progress.overview') }}" class="sidebar-item">
+                <a href="{{ route('progress.overview') }}"
+                    class="sidebar-item {{ request()->routeIs('progress.overview') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z">
