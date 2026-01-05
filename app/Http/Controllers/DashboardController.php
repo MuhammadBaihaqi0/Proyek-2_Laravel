@@ -107,57 +107,57 @@ class DashboardController extends Controller
          * ===============================
          */
         if ($routeName === 'statistik.tugas') {
-             $user = Auth::user();
-    $today = Carbon::today();
+            $user = Auth::user();
+            $today = Carbon::today();
 
-    /**
-     * ===============================
-     * TOTAL FOKUS HARI INI
-     * ===============================
-     */
-    $totalFocusTodaySeconds = PomodoroSession::where('user_id', $user->id)
-        ->where('type', 'focus')
-        ->whereDate('started_at', $today)
-        ->sum('duration_seconds');
+            /**
+             * ===============================
+             * TOTAL FOKUS HARI INI
+             * ===============================
+             */
+            $totalFocusTodaySeconds = PomodoroSession::where('user_id', $user->id)
+                ->where('type', 'focus')
+                ->whereDate('started_at', $today)
+                ->sum('duration_seconds');
 
-    $totalFocusTodayMinutes = round($totalFocusTodaySeconds / 60);
+            $totalFocusTodayMinutes = round($totalFocusTodaySeconds / 60);
 
-    /**
-     * ===============================
-     * FOKUS MINGGU INI (HARIAN)
-     * ===============================
-     */
-    $startOfWeek = Carbon::now()->startOfWeek(); // Senin
-    $endOfWeek   = Carbon::now()->endOfWeek();   // Minggu
+            /**
+             * ===============================
+             * FOKUS MINGGU INI (HARIAN)
+             * ===============================
+             */
+            $startOfWeek = Carbon::now()->startOfWeek(); // Senin
+            $endOfWeek   = Carbon::now()->endOfWeek();   // Minggu
 
-    $labels = [];
-    $dataFocusMinutes = [];
+            $labels = [];
+            $dataFocusMinutes = [];
 
-    for ($date = $startOfWeek->copy(); $date <= $endOfWeek; $date->addDay()) {
-        $labels[] = $date->translatedFormat('D');
+            for ($date = $startOfWeek->copy(); $date <= $endOfWeek; $date->addDay()) {
+                $labels[] = $date->translatedFormat('D');
 
-        $minutes = PomodoroSession::where('user_id', $user->id)
-            ->where('type', 'focus')
-            ->whereDate('started_at', $date)
-            ->sum('duration_seconds');
+                $minutes = PomodoroSession::where('user_id', $user->id)
+                    ->where('type', 'focus')
+                    ->whereDate('started_at', $date)
+                    ->sum('duration_seconds');
 
-        $dataFocusMinutes[] = round($minutes / 60);
-    }
+                $dataFocusMinutes[] = round($minutes / 60);
+            }
 
-    /**
-     * ===============================
-     * RATA-RATA FOKUS MINGGU INI
-     * ===============================
-     */
-    $totalWeekMinutes = array_sum($dataFocusMinutes);
-    $avgFocusMinutes = round($totalWeekMinutes / 7);
+            /**
+             * ===============================
+             * RATA-RATA FOKUS MINGGU INI
+             * ===============================
+             */
+            $totalWeekMinutes = array_sum($dataFocusMinutes);
+            $avgFocusMinutes = round($totalWeekMinutes / 7);
 
-    return view('analytics.statistik', [
-        'labels'                => $labels,
-        'dataFocusMinutes'      => $dataFocusMinutes,
-        'totalFocusTodayMinutes'=> $totalFocusTodayMinutes,
-        'avgFocusMinutes'       => $avgFocusMinutes,
-    ]);
+            return view('analytics.statistik', [
+                'labels'                => $labels,
+                'dataFocusMinutes'      => $dataFocusMinutes,
+                'totalFocusTodayMinutes' => $totalFocusTodayMinutes,
+                'avgFocusMinutes'       => $avgFocusMinutes,
+            ]);
         }
         /**
          * ===============================
