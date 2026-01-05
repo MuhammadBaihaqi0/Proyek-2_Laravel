@@ -1,4 +1,3 @@
-
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -14,24 +13,34 @@
                         🚀 Tinjauan Kemajuan & Pencapaian
                     </h3>
                     <p class="text-lg text-gray-600 mb-8">
-                        Lihat kemajuan tugas Anda dalam jangka panjang (kumulatif) dan persentase penyelesaian keseluruhan.
+                        Lihat kemajuan tugas Anda dalam jangka panjang (kumulatif) dan persentase penyelesaian
+                        keseluruhan.
                     </p>
 
                     <div class="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-xl shadow-md">
                         <h4 class="text-xl font-bold text-blue-800 mb-3">Progress Keseluruhan Tugas Selesai</h4>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div class="bg-blue-600 h-4 rounded-full" style="width: {{ $overallProgressPercent }}%"></div>
+                        <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-700 ease-out"
+                                style="
+            width: {{ $overallProgressPercent }}%;
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);">
+                            </div>
                         </div>
-                        <p class="text-sm text-blue-600 mt-2 font-semibold">{{ $overallProgressPercent }}% Tugas Selesai Secara Keseluruhan</p>
+
+                        <p class="mt-2 text-sm text-gray-600">
+                            {{ $overallProgressPercent }}% Tugas Selesai Secara Keseluruhan
+                        </p>
                     </div>
 
                     <div class="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-inner">
-                        <h4 class="text-lg font-bold text-purple-800 mb-4">Kinerja Tugas Kumulatif (12 Bulan Terakhir)</h4>
+                        <h4 class="text-lg font-bold text-purple-800 mb-4">Kinerja Tugas Kumulatif (12 Bulan Terakhir)
+                        </h4>
                         <div style="height: 400px;">
                             <canvas id="cumulativeChart"></canvas>
                         </div>
                     </div>
-                    <a href="{{ route('dashboard') }}" class="mt-10 inline-block text-indigo-600 hover:text-indigo-800 font-medium text-sm">
+                    <a href="{{ route('dashboard') }}"
+                        class="mt-10 inline-block text-indigo-600 hover:text-indigo-800 font-medium text-sm">
                         ← Kembali ke Dashboard
                     </a>
                 </div>
@@ -43,25 +52,25 @@
         // Ambil data dari PHP menggunakan blade directive
         const chartLabels = @json($labels);
         const chartData = @json($cumulativeData);
-        
-        document.addEventListener('DOMContentLoaded', function () {
+
+        document.addEventListener('DOMContentLoaded', function() {
             // Pastikan Chart.js sudah dimuat (diasumsikan sudah di app.blade.php)
             const ctx = document.getElementById('cumulativeChart');
-            
+
             const data = {
-                labels: chartLabels, 
+                labels: chartLabels,
                 datasets: [{
                     label: 'Total Tugas Selesai Kumulatif',
-                    data: chartData, 
+                    data: chartData,
                     fill: true,
-                    backgroundColor: 'rgba(167, 139, 250, 0.2)', 
-                    borderColor: 'rgb(167, 139, 250)', 
+                    backgroundColor: 'rgba(167, 139, 250, 0.2)',
+                    borderColor: 'rgb(167, 139, 250)',
                     tension: 0.3
                 }]
             };
 
             const config = {
-                type: 'line', 
+                type: 'line',
                 data: data,
                 options: {
                     responsive: true,
@@ -74,7 +83,7 @@
                                 text: 'Total Tugas Selesai'
                             },
                             ticks: {
-                                precision: 0 
+                                precision: 0
                             }
                         }
                     },
