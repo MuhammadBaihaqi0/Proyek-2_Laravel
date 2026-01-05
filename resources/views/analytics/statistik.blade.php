@@ -28,36 +28,16 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-4 mt-6">
-
-                        <div>
-                            <p class="text-xs text-gray-500 uppercase font-bold">Total Fokus Hari Ini</p>
-                            <p id="totalFocusToday" class="text-2xl font-bold text-indigo-600">
-                                {{ $totalFocusTodayMinutes }} menit
-                            </p>
-
-                        </div>
-
-
-                        <div>
-                            <p class="text-xs text-gray-500 uppercase font-bold">Rata-rata Fokus Mingguan</p>
-                            <p id="avgFocusWeek" class="text-2xl font-bold text-emerald-600">
-                                {{ $avgFocusMinutes }} menit / hari
-                            </p>
-
-                        </div>
-
                         <div>
                             <p class="text-xs text-gray-500 uppercase font-bold">Pomodoro Hari Ini</p>
                             <p id="pomodoroToday" class="text-2xl font-bold text-indigo-600">
                                 — menit
                             </p>
-
                             <p class="text-xs text-gray-500 uppercase font-bold mt-4">Pomodoro Minggu Ini (total)</p>
                             <p id="pomodoroWeek" class="text-2xl font-bold text-emerald-600">
                                 — menit
                             </p>
                         </div>
-
                     </div>
 
 
