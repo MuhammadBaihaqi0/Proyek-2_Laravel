@@ -102,6 +102,17 @@ Route::get('/debug/pomodoro-sessions', function () {
     ]);
 })->middleware('auth');
 
+// Route untuk serve file storage (alternatif symbolic link)
+Route::get('/storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+    
+    return response()->file($fullPath);
+})->where('path', '.*')->name('storage.file');
+
 
 /*
 |--------------------------------------------------------------------------

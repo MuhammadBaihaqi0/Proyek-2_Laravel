@@ -142,7 +142,7 @@
                             <div>
                                 <p class="text-xs text-gray-500 font-bold uppercase">Acara Selesai</p>
                                 <p class="text-lg font-bold text-gray-800">
-                                    {{count($riwayat_acara) }}</p>
+                                    {{ count($riwayat_acara) }}</p>
                             </div>
                             <div class="p-3 bg-pink-50 rounded-lg text-pink-500 text-xl">📅</div>
                         </div>
@@ -275,31 +275,45 @@
                                 <div class="space-y-3 max-h-[350px] overflow-y-auto no-scrollbar pr-1">
                                     @forelse($acara as $a)
                                         <div
-                                            class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 bg-white border border-gray-100 rounded-lg shadow-sm hover:border-emerald-300 hover:shadow-md transition group">
-                                            <div class="flex items-center gap-3 overflow-hidden">
+                                            class="flex items-center justify-between gap-3 p-4 bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition">
+
+                                            <!-- KIRI: INFO ACARA -->
+                                            <div class="flex items-center gap-3 min-w-0">
+
+                                                <!-- TANGGAL -->
                                                 <div
                                                     class="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex flex-col items-center justify-center border border-emerald-200">
-                                                    <span
-                                                        class="text-[9px] uppercase font-bold">{{ \Carbon\Carbon::parse($a->tanggal)->format('M') }}</span>
-                                                    <span
-                                                        class="text-sm font-bold leading-none">{{ \Carbon\Carbon::parse($a->tanggal)->format('d') }}</span>
+                                                    <span class="text-[9px] uppercase font-bold">
+                                                        {{ \Carbon\Carbon::parse($a->tanggal)->format('M') }}
+                                                    </span>
+                                                    <span class="text-sm font-bold leading-none">
+                                                        {{ \Carbon\Carbon::parse($a->tanggal)->format('d') }}
+                                                    </span>
                                                 </div>
+
+                                                <!-- TEKS -->
                                                 <div class="min-w-0">
                                                     <h4 class="font-semibold text-gray-800 text-sm truncate">
-                                                        {{ $a->nama_acara }}</h4>
+                                                        {{ $a->nama_acara }}
+                                                    </h4>
                                                     <p class="text-xs text-gray-500">
                                                         {{ \Carbon\Carbon::parse($a->tanggal)->translatedFormat('l, d F Y') }}
                                                     </p>
                                                 </div>
                                             </div>
 
+                                            <!-- KANAN: TOMBOL SAMPAH (SVG ASLI) -->
                                             <form action="{{ route('acara.destroy', $a->id) }}" method="POST"
                                                 onsubmit="return confirm('Hapus acara ini?')"
                                                 class="flex-shrink-0 ml-2">
-                                                @csrf @method('DELETE')
+                                                @csrf
+                                                @method('DELETE')
+
                                                 <button type="submit"
                                                     class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition"
                                                     title="Hapus Acara">
+
+                                                    <!-- SVG TETAP -->
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -307,9 +321,12 @@
                                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                                         </path>
                                                     </svg>
+
                                                 </button>
                                             </form>
+
                                         </div>
+
                                     @empty
                                         <div class="text-center py-10 opacity-60">
                                             <p class="text-4xl opacity-50 mb-2">🎈</p>

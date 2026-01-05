@@ -18,7 +18,13 @@ class ProfileController extends Controller
         // Logika Avatar yang Pintar (sama seperti di DashboardController)
         $user = $request->user();
         if ($user->avatar) {
-            $avatar_path = asset('storage/' . $user->avatar);
+            // Cek apakah file ada di storage, jika ada gunakan route storage, jika tidak gunakan gravatar
+            $storagePath = storage_path('app/public/' . $user->avatar);
+            if (file_exists($storagePath)) {
+                $avatar_path = route('storage.file', ['path' => $user->avatar]);
+            } else {
+                $avatar_path = 'https://ui-avatars.com/api/?name=' . urlencode($user->username) . '&background=random&color=ffffff&size=128&bold=true';
+            }
         } else {
             $avatar_path = 'https://ui-avatars.com/api/?name=' . urlencode($user->username) . '&background=random&color=ffffff&size=128&bold=true';
         }

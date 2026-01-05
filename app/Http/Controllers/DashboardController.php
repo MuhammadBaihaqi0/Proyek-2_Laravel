@@ -25,9 +25,16 @@ class DashboardController extends Controller
         $tanggalHariIni = Carbon::now()->translatedFormat('l, d F Y');
 
         // Avatar
-        $avatar_path = $user->avatar
-            ? asset('storage/' . $user->avatar)
-            : 'https://ui-avatars.com/api/?name=' . urlencode($user->username) . '&background=random&color=ffffff&size=128&bold=true';
+        if ($user->avatar) {
+            $storagePath = storage_path('app/public/' . $user->avatar);
+            if (file_exists($storagePath)) {
+                $avatar_path = route('storage.file', ['path' => $user->avatar]);
+            } else {
+                $avatar_path = 'https://ui-avatars.com/api/?name=' . urlencode($user->username) . '&background=random&color=ffffff&size=128&bold=true';
+            }
+        } else {
+            $avatar_path = 'https://ui-avatars.com/api/?name=' . urlencode($user->username) . '&background=random&color=ffffff&size=128&bold=true';
+        }
 
         // Tugas Aktif
         $tugas_aktif = $user->tugas()
