@@ -5,59 +5,107 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TugasController;
 use App\Http\Controllers\AcaraController;
-use App\Http\Controllers\PomodoroController;
+use App\Http\Controllers\Auth\PomodoroController;
 use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\AdminController;
+
+/*
+| Redirect Awal
+*/
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
+/*
+| Dashboard (User)
+*/
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+/*
+Route Terproteksi (Login Required)
+*/
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/change-password', [PasswordController::class, 'edit'])->name('password.edit');
-    Route::put('/change-password', [PasswordController::class, 'update'])->name('password.update');
-});
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::middleware('auth')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Profile
+    /*
+    | Profile
+    */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/avatar', [ProfileController::class, 'destroy_avatar'])->name('profile.destroy_avatar');
 
-    Route::resource('tugas', TugasController::class);
-    Route::resource('acara', AcaraController::class);
-    Route::patch('/tugas/{id}/selesai', [TugasController::class, 'selesai'])->name('tugas.selesai');
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard_admin');
+    /*
+    | Password
+    */
+    Route::get('/change-password', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('/change-password', [PasswordController::class, 'update'])->name('password.update');
 
-    // START: RUTE BARU UNTUK ANALITIK
+    /*
+    | Tugas & Acara
+    */
+    Route::resource('tugas', TugasController::class);
+    Route::patch('/tugas/{id}/selesai', [TugasController::class, 'selesai'])->name('tugas.selesai');
+
+    Route::resource('acara', AcaraController::class);
+
+    /*
+    | Analitik Dashboard
+    */
     Route::get('/laporan-bulanan/{year?}/{month?}', [DashboardController::class, 'indexAnalytics'])->name('laporan.bulanan');
     Route::get('/statistik-tugas', [DashboardController::class, 'indexAnalytics'])->name('statistik.tugas');
     Route::get('/progress-overview', [DashboardController::class, 'indexAnalytics'])->name('progress.overview');
-    // END: RUTE BARU UNTUK ANALITIK
-});
 
-Route::middleware('auth')->group(function () {
+    /*
+    | Pomodoro
+    */
     Route::post('/pomodoro/start', [PomodoroController::class, 'start']);
     Route::post('/pomodoro/finish', [PomodoroController::class, 'finish']);
     Route::post('/pomodoro/focus-ended', [PomodoroController::class, 'focusEnded']);
 });
+
+Route::get('/statistik/pomodoro-live', function () {
+    $user = Auth::user();
+    $today = Carbon\Carbon::today();
+
+    $totalSecondsToday = \App\Models\PomodoroSession::where('user_id', $user->id)
+        ->where('type', 'focus')
+        ->whereDate('started_at', $today)
+        ->sum('duration_seconds');
+
+    $startOfWeek = Carbon\Carbon::now()->startOfWeek();
+    $endOfWeek   = Carbon\Carbon::now()->endOfWeek();
+
+    $weekSeconds = \App\Models\PomodoroSession::where('user_id', $user->id)
+        ->where('type', 'focus')
+        ->whereBetween('started_at', [$startOfWeek, $endOfWeek])
+        ->sum('duration_seconds');
+
+    return response()->json([
+        'today_minutes' => round($totalSecondsToday / 60),
+        'avg_week_minutes' => round(($weekSeconds / 60) / 7),
+        'week_total_minutes' => round($weekSeconds / 60)
+    ]);
+})->middleware('auth');
+
+// DEBUG: Lihat semua pomodoro session untuk user
+Route::get('/debug/pomodoro-sessions', function () {
+    $user = Auth::user();
+    $sessions = \App\Models\PomodoroSession::where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get();
+
+    return response()->json([
+        'user_id' => $user->id,
+        'sessions' => $sessions->toArray()
+    ]);
+})->middleware('auth');
+
+
+/*
+|--------------------------------------------------------------------------
+| Auth Routes (Login, Register, dll)
+|--------------------------------------------------------------------------
+*/
 require __DIR__ . '/auth.php';

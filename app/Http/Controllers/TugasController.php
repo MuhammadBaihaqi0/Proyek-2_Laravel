@@ -102,13 +102,23 @@ class TugasController extends Controller
         return back()->with('success_message', 'Tugas berhasil dihapus!');
     }
     // Fungsi untuk menandai tugas selesai
-    public function selesai($id)
+    public function selesai(Request $request, $id)
     {
         $tugas = Tugas::findOrFail($id);
 
         $tugas->status = 'selesai';
         $tugas->selesai_pada = now(); // ⬅️ INI KUNCI
         $tugas->save();
+
+        // Jika request dari AJAX/Pomodoro widget, return JSON
+        if ($request->wantsJson()) {
+            return response()->json([
+                'ok' => true,
+                'message' => 'Tugas diselesaikan',
+                'tugas_id' => $tugas->id,
+                'status' => $tugas->status
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Tugas diselesaikan');
     }

@@ -8,6 +8,7 @@ use App\Models\Acara;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\PomodoroSession;
 
 class DashboardController extends Controller
 {
@@ -99,70 +100,80 @@ class DashboardController extends Controller
          * ===============================
          */
         if ($routeName === 'statistik.tugas') {
+             $user = Auth::user();
+    $today = Carbon::today();
 
-            $labels = [];
-            $dataCount = [];
+    /**
+     * ===============================
+     * TOTAL FOKUS HARI INI
+     * ===============================
+     */
+    $totalFocusTodaySeconds = PomodoroSession::where('user_id', $user->id)
+        ->where('type', 'focus')
+        ->whereDate('started_at', $today)
+        ->sum('duration_seconds');
 
-            for ($i = 5; $i >= 0; $i--) {
-                $bulan = Carbon::now()->subMonths($i);
+    $totalFocusTodayMinutes = round($totalFocusTodaySeconds / 60);
 
-                $labels[] = $bulan->translatedFormat('M Y');
+    /**
+     * ===============================
+     * FOKUS MINGGU INI (HARIAN)
+     * ===============================
+     */
+    $startOfWeek = Carbon::now()->startOfWeek(); // Senin
+    $endOfWeek   = Carbon::now()->endOfWeek();   // Minggu
 
-                $jumlah = Tugas::where('user_id', $user->id)
-                    ->where('status', 'selesai')
-                    ->whereYear('selesai_pada', $bulan->year)
-                    ->whereMonth('selesai_pada', $bulan->month)
-                    ->count();
+    $labels = [];
+    $dataFocusMinutes = [];
 
-                $dataCount[] = $jumlah;
-            }
+    for ($date = $startOfWeek->copy(); $date <= $endOfWeek; $date->addDay()) {
+        $labels[] = $date->translatedFormat('D');
 
-            // Ringkasan
-            $totalSelesai = $user->tugas()->where('status', 'selesai')->count();
-            $totalAktif   = $user->tugas()->where('status', '!=', 'selesai')->count();
+        $minutes = PomodoroSession::where('user_id', $user->id)
+            ->where('type', 'focus')
+            ->whereDate('started_at', $date)
+            ->sum('duration_seconds');
 
-            // Rata-rata waktu pengerjaan
-           $avgMinutes = $user->tugas()
-                ->where('status', 'selesai')
-                ->whereNotNull('selesai_pada')
-                ->select(DB::raw('AVG(TIMESTAMPDIFF(MINUTE, created_at, selesai_pada)) as avg'))
-                ->value('avg');
+        $dataFocusMinutes[] = round($minutes / 60);
+    }
 
-            $avgTime = $avgMinutes
-                ? round($avgMinutes / 60, 1) . ' jam'
-                : '-'; 
+    /**
+     * ===============================
+     * RATA-RATA FOKUS MINGGU INI
+     * ===============================
+     */
+    $totalWeekMinutes = array_sum($dataFocusMinutes);
+    $avgFocusMinutes = round($totalWeekMinutes / 7);
 
-            return view('analytics.statistik', [
-                'labels'        => $labels,
-                'dataCount'     => $dataCount,
-                'totalSelesai'  => $totalSelesai,
-                'totalAktif'    => $totalAktif,
-                'avgTime'       => $avgTime,
-            ]);
+    return view('analytics.statistik', [
+        'labels'                => $labels,
+        'dataFocusMinutes'      => $dataFocusMinutes,
+        'totalFocusTodayMinutes'=> $totalFocusTodayMinutes,
+        'avgFocusMinutes'       => $avgFocusMinutes,
+    ]);
         }
-
         /**
          * ===============================
          * LAPORAN BULANAN (DIPERBAIKI)
          * ===============================
          */
         if ($routeName === 'laporan.bulanan') {
-            
+
             // --- Tentukan Bulan Target (PERBAIKAN ERROR INVALID DATE EXCEPTION) ---
             if ($year && $month) {
                 $targetDate = Carbon::parse("{$year}-{$month}-01");
             } else {
                 $targetDate = Carbon::now();
             }
-            
+
             $startOfMonth = $targetDate->startOfMonth()->toDateString();
             $endOfMonth = $targetDate->endOfMonth()->toDateString();
-            
+
             // Data Bulan dan Tahun saat ini
             $currentMonthYear = $targetDate->isoFormat('MMMM Y');
             $selectedYear = $targetDate->year;
             $selectedMonth = $targetDate->month;
-            
+
             // 1. Total Tugas dibuat
             $totalTugasBulanIni = $user->tugas()
                 ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
@@ -182,15 +193,15 @@ class DashboardController extends Controller
                 ->get();
 
             // 4. Hitung Rasio
-            $rasioPenyelesaianBulanIni = ($totalTugasBulanIni > 0) 
-                ? round(($tugasSelesaiBulanIni->count() / $totalTugasBulanIni) * 100) 
+            $rasioPenyelesaianBulanIni = ($totalTugasBulanIni > 0)
+                ? round(($tugasSelesaiBulanIni->count() / $totalTugasBulanIni) * 100)
                 : 0;
 
             // 5. LOGIKA KESIMPULAN PRODUKTIVITAS
             $kesimpulan = '';
             $saran = '';
             $iconKesimpulan = '';
-            
+
             $rasio = $rasioPenyelesaianBulanIni;
             $totalTugas = $totalTugasBulanIni;
             $totalAcara = $acaraBulanIni->count();
@@ -228,7 +239,7 @@ class DashboardController extends Controller
             // 6. Generate Bulan yang Tersedia
             $taskMonths = Tugas::select(DB::raw('YEAR(created_at) as year'), DB::raw('MONTH(created_at) as month'))
                 ->where('user_id', $user->id)->distinct()->get();
-            
+
             $acaraMonths = Acara::select(DB::raw('YEAR(tanggal) as year'), DB::raw('MONTH(tanggal) as month'))
                 ->where('user_id', $user->id)->distinct()->get();
 
@@ -237,20 +248,20 @@ class DashboardController extends Controller
             $availableMonths = $allMonths->unique(function ($item) {
                 return $item['year'] . '-' . $item['month'];
             })
-            ->sortByDesc(function ($item) {
-                return $item['year'] * 100 + $item['month'];
-            })
-            ->map(function ($item) {
-                $date = Carbon::createFromDate($item['year'], $item['month'], 1);
-                return [
-                    'year' => $item['year'],
-                    'month' => $item['month'],
-                    'label' => $date->isoFormat('MMMM Y'),
-                ];
-            })->values();
+                ->sortByDesc(function ($item) {
+                    return $item['year'] * 100 + $item['month'];
+                })
+                ->map(function ($item) {
+                    $date = Carbon::createFromDate($item['year'], $item['month'], 1);
+                    return [
+                        'year' => $item['year'],
+                        'month' => $item['month'],
+                        'label' => $date->isoFormat('MMMM Y'),
+                    ];
+                })->values();
 
             if ($availableMonths->isEmpty()) {
-                 $availableMonths->push([
+                $availableMonths->push([
                     'year' => Carbon::now()->year,
                     'month' => Carbon::now()->month,
                     'label' => Carbon::now()->isoFormat('MMMM Y'),
@@ -258,8 +269,8 @@ class DashboardController extends Controller
             }
 
             return view('analytics.laporan_bulanan', compact(
-                'totalTugasBulanIni', 
-                'tugasSelesaiBulanIni', 
+                'totalTugasBulanIni',
+                'tugasSelesaiBulanIni',
                 'acaraBulanIni',
                 'rasioPenyelesaianBulanIni',
                 'currentMonthYear',
@@ -278,26 +289,26 @@ class DashboardController extends Controller
          * ===============================
          */
         if ($routeName === 'progress.overview') {
-            
+
             // 1. Data untuk chart kumulatif (12 bulan terakhir)
             $tasksCompletedAllTime = $user->tugas()
                 ->where('status', 'selesai')
                 ->orderBy('updated_at', 'asc')
                 ->get();
-            
+
             $labels = [];
             $cumulativeData = [];
             $currentCumulativeCount = 0;
-            
+
             for ($i = 11; $i >= 0; $i--) {
                 $month = Carbon::now()->subMonths($i);
-                $monthName = $month->isoFormat('MMM YY'); 
+                $monthName = $month->isoFormat('MMM YY');
                 $labels[] = $monthName;
 
                 $tasksThisMonth = $tasksCompletedAllTime->filter(function ($task) use ($month) {
                     return $task->updated_at && $task->updated_at->format('Y-m') === $month->format('Y-m');
                 })->count();
-                
+
                 $currentCumulativeCount += $tasksThisMonth;
                 $cumulativeData[] = $currentCumulativeCount;
             }
@@ -309,10 +320,10 @@ class DashboardController extends Controller
             $overallProgressPercent = ($totalTasksAllTime > 0)
                 ? round(($totalTasksCompletedAllTime / $totalTasksAllTime) * 100)
                 : 0;
-            
+
             return view('analytics.progress_overview', compact(
-                'labels', 
-                'cumulativeData', 
+                'labels',
+                'cumulativeData',
                 'overallProgressPercent'
             ));
         }
