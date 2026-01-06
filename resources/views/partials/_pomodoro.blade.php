@@ -63,7 +63,8 @@
             endTime: null, // timestamp (ms)
             focusMin: DEFAULT_FOCUS_MIN,
             timerId: null,
-            activeTask: null // { id, title }
+            activeTask: null, // { id, title }
+            remainingSeconds: null // saved remaining time when stopped
         };
 
         /* =====================
@@ -168,12 +169,19 @@
 
             state.running = true;
             state.paused = false;
-            state.endTime = Date.now() + state.focusMin * 60 * 1000;
+
+            // if resuming from stopped state, use remaining time; otherwise use full duration
+            const durationSec = state.remainingSeconds !== null ? state.remainingSeconds : state.focusMin * 60;
+            state.endTime = Date.now() + durationSec * 1000;
+            state.remainingSeconds = null; // clear saved remaining time
 
             widget.style.display = 'block';
             state.timerId = setInterval(tick, 1000);
 
-            notify('Pomodoro dimulai', `Fokus selama ${state.focusMin} menit.`);
+            // hide settings button while session is running
+            if (settingsBtn) settingsBtn.style.display = 'none';
+
+            notify('Pomodoro dimulai', `Fokus selama ${Math.ceil(durationSec / 60)} menit.`);
             saveState();
             updateUI();
         }
@@ -184,9 +192,21 @@
             state.paused = !state.paused;
 
             if (state.paused) {
+                // compute and save remaining seconds, then pause
+                if (state.endTime) {
+                    const now = Date.now();
+                    const remainingSec = Math.ceil((state.endTime - now) / 1000);
+                    state.remainingSeconds = Math.max(0, remainingSec);
+                }
                 clearInterval(state.timerId);
                 state.timerId = null;
+                // clear endTime so background doesn't keep counting
+                state.endTime = null;
             } else {
+                // resume from saved remainingSeconds if present
+                const durationSec = state.remainingSeconds !== null ? state.remainingSeconds : state.focusMin * 60;
+                state.endTime = Date.now() + durationSec * 1000;
+                state.remainingSeconds = null;
                 state.timerId = setInterval(tick, 1000);
             }
 
@@ -197,19 +217,33 @@
         function stopTimer(autoFinish = false) {
             clearInterval(state.timerId);
 
+            // if already paused we may already have remainingSeconds saved
+            if (!autoFinish) {
+                if (state.paused && state.remainingSeconds !== null) {
+                    // keep existing remainingSeconds
+                } else if (state.endTime) {
+                    const now = Date.now();
+                    const remainingSec = Math.ceil((state.endTime - now) / 1000);
+                    state.remainingSeconds = Math.max(0, remainingSec);
+                } else {
+                    state.remainingSeconds = null;
+                }
+            } else {
+                state.remainingSeconds = null;
+            }
+
             state.running = false;
             state.paused = false;
             state.endTime = null;
             state.timerId = null;
 
-            if (!autoFinish && state.activeTask?.id) {
-                finishSessionOnServer(state.activeTask.id);
-            }
-
             // hide finish button when stopped
             if (finishBtn) finishBtn.style.display = 'none';
 
-            state.activeTask = null;
+            // restore settings button visibility when stopped
+            if (settingsBtn) settingsBtn.style.display = 'inline-flex';
+
+            // keep activeTask so user can resume the same task later
             widget.style.display = 'none';
 
             saveState();
@@ -229,7 +263,11 @@
                 'Tidak ada tugas aktif';
 
             if (!state.running) {
-                timerEl.textContent = formatTime(state.focusMin * 60);
+                if (state.remainingSeconds !== null) {
+                    timerEl.textContent = formatTime(state.remainingSeconds);
+                } else {
+                    timerEl.textContent = formatTime(state.focusMin * 60);
+                }
             }
 
             // toggle finish button visibility
@@ -362,7 +400,7 @@
         };
 
         window.stopTaskPomodoro = function(id) {
-            if (id) finishSessionOnServer(id);
+            // Stop locally without marking task finished on server
             stopTimer();
         };
 
