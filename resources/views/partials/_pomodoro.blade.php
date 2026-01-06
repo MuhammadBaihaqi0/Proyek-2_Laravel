@@ -27,8 +27,6 @@
             <div style="margin-top:8px; display:flex; gap:8px;">
                 <button id="pom-pause" type="button"
                     style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Pause</button>
-                <button id="pom-settings" type="button"
-                    style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Settings</button>
             </div>
         </div>
 
