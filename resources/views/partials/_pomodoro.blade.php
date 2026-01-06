@@ -14,20 +14,22 @@
             </div>
         </div>
 
-        <div style="margin-top:12px; display:flex; gap:8px;">
-            <button id="pom-start" class="btn" type="button"
-                style="flex:1; padding:8px; border-radius:8px; border: none; background:#10b981; color:white; cursor:pointer;">Start</button>
-            <button id="pom-finish" class="btn" type="button"
-                style="flex:1; padding:8px; border-radius:8px; border:none; background:#2563eb; color:white; cursor:pointer; display:none;">Finish</button>
-            <button id="pom-stop" class="btn" type="button"
-                style="flex:1; padding:8px; border-radius:8px; border:none; background:#ef4444; color:white; cursor:pointer;">Stop</button>
-        </div>
+        <div id="pom-main-controls" style="margin-top:12px;">
+            <div style="display:flex; gap:8px;">
+                <button id="pom-start" class="btn" type="button"
+                    style="flex:1; padding:8px; border-radius:8px; border: none; background:#10b981; color:white; cursor:pointer;">Start</button>
+                <button id="pom-finish" class="btn" type="button"
+                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#2563eb; color:white; cursor:pointer; display:none;">Finish</button>
+                <button id="pom-stop" class="btn" type="button"
+                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#ef4444; color:white; cursor:pointer;">Stop</button>
+            </div>
 
-        <div style="margin-top:8px; display:flex; gap:8px;">
-            <button id="pom-pause" type="button"
-                style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Pause</button>
-            <button id="pom-settings" type="button"
-                style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Settings</button>
+            <div style="margin-top:8px; display:flex; gap:8px;">
+                <button id="pom-pause" type="button"
+                    style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Pause</button>
+                <button id="pom-settings" type="button"
+                    style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Settings</button>
+            </div>
         </div>
 
         <div id="pom-settings-panel" style="display:none; margin-top:10px; font-size:13px; color:#444;">
@@ -81,6 +83,7 @@
         const modeEl = document.getElementById('pom-mode');
         const activeTaskEl = document.getElementById('pom-active-task');
         const focusMinInput = document.getElementById('pom-focus-min');
+        const mainControls = document.getElementById('pom-main-controls');
 
         /* =====================
          * UTIL
@@ -222,7 +225,7 @@
                 'Siap';
 
             activeTaskEl.textContent = state.activeTask ?
-                'Sedang: ' + state.activeTask.title :
+                'Sedang mengerjakan: ' + state.activeTask.title :
                 'Tidak ada tugas aktif';
 
             if (!state.running) {
@@ -351,6 +354,8 @@
                 title
             } : null;
             if (widget) widget.style.display = 'block';
+            // hide primary controls and show only duration panel (Mulai / Batal)
+            if (mainControls) mainControls.style.display = 'none';
             if (settingsPanel) settingsPanel.style.display = 'block';
             focusMinInput.focus();
             updateUI();
@@ -385,13 +390,18 @@
                     startSessionOnServer(state.activeTask.id).catch(e => console.warn(e));
                 }
                 startTimer();
+                // after confirming start, hide settings and reveal controls
                 if (settingsPanel) settingsPanel.style.display = 'none';
+                if (mainControls) mainControls.style.display = 'block';
             };
         }
 
         if (cancelStartBtn) {
             cancelStartBtn.onclick = () => {
+                // Cancel choosing duration: hide panel and close widget
                 if (settingsPanel) settingsPanel.style.display = 'none';
+                if (mainControls) mainControls.style.display = 'none';
+                if (widget) widget.style.display = 'none';
             };
         }
 
