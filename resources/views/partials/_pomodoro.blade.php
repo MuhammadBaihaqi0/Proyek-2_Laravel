@@ -17,18 +17,27 @@
         <div id="pom-main-controls" style="margin-top:12px;">
             <div style="display:flex; gap:8px;">
                 <button id="pom-start" class="btn" type="button"
-                    style="flex:1; padding:8px; border-radius:8px; border: none; background:#10b981; color:white; cursor:pointer;">Start</button>
-                <button id="pom-finish" class="btn" type="button"
-                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#2563eb; color:white; cursor:pointer; display:none;">Finish</button>
-                <button id="pom-stop" class="btn" type="button"
-                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#ef4444; color:white; cursor:pointer;">Stop</button>
-            </div>
+                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#10b981; color:white; cursor:pointer;">
+                    Start
+                </button>
 
-            <div style="margin-top:8px; display:flex; gap:8px;">
                 <button id="pom-pause" type="button"
-                    style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">Pause</button>
+                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#facc15; color:#000; cursor:pointer; display:none;">
+                    Pause
+                </button>
+
+                <button id="pom-stop" class="btn" type="button"
+                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#ef4444; color:white; cursor:pointer;">
+                    Stop
+                </button>
+
+                  <button id="pom-finish" class="btn" type="button"
+                    style="flex:1; padding:8px; border-radius:8px; border:none; background:#2563eb; color:white; cursor:pointer; display:none;">
+                    Finish
+                </button>
             </div>
         </div>
+
 
         <div id="pom-settings-panel" style="display:none; margin-top:10px; font-size:13px; color:#444;">
             <div style="display:flex; gap:8px; align-items:center;">
@@ -268,11 +277,22 @@
                 }
             }
 
-            // toggle finish button visibility
-            if (finishBtn) {
-                finishBtn.style.display = state.running ? 'inline-flex' : 'none';
+            // === VISIBILITY LOGIC ===
+            if (state.running) {
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-flex';
+                finishBtn.style.display = 'inline-flex';
+                stopBtn.style.display = 'inline-flex';
+
+                pauseBtn.textContent = state.paused ? 'Resume' : 'Pause';
+            } else {
+                startBtn.style.display = 'inline-flex';
+                pauseBtn.style.display = 'none';
+                finishBtn.style.display = 'none';
+                stopBtn.style.display = 'inline-flex';
             }
         }
+
 
         /* =====================
          * BACKEND
