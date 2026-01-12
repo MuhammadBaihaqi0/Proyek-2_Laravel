@@ -20,11 +20,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',      // Wajib untuk Laravel Default
-        'email',     // Wajib untuk Laravel Default
-        'username',  // Tambahan Anda
+        'name',      
+        'email',    
+        'username',  
         'password',
-        'avatar',    // Tambahan Anda
+        'avatar',    
     ];
 
     /**
