@@ -13,14 +13,16 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-    Schema::create('users', function (Blueprint $table) {
-    $table->id();
-    $table->string('username')->unique(); // Dari auth.php
-    $table->string('password'); // Dari auth.php
-    $table->string('avatar')->nullable(); // Dari dashboard.php
-    // $table->timestamp('email_verified_at')->nullable(); // Laravel default, bisa dihapus jika tidak perlu
-    // $table->rememberToken(); // Laravel default
-    $table->timestamps(); // Ini akan membuat created_at dan updated_at
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->string('email')->unique();
+            $table->string('username')->unique();
+            $table->string('password');
+            $table->string('avatar')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
 
