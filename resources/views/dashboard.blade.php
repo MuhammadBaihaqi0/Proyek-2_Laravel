@@ -104,11 +104,6 @@
                                     <p class="text-indigo-100 mt-1">Semoga harimu menyenangkan dan produktif!</p>
                                 </div>
                             </div>
-                            <div class="hidden md:block text-right max-w-xs opacity-90 border-l border-white/20 pl-6">
-                                <p class="italic text-sm">"Success is a final, failure is not fatal: it is the courage
-                                    to continue that counts."</p>
-                                <p class="text-xs mt-2 font-bold">— Winston Churchill</p>
-                            </div>
                         </div>
                     </div>
 
@@ -397,10 +392,10 @@
                 <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-200 shadow-md">
                     <h4
                         class="font-bold text-indigo-700 uppercase text-xs mb-3 tracking-wider flex items-center gap-1">
-                        <span class="text-lg">✅</span> Tugas Selesai (Total)
+                        <span class="text-lg">✅</span> Tugas Selesai
                     </h4>
                     <p class="text-4xl font-extrabold text-indigo-900">{{ count($riwayat_tugas) }}</p>
-                    <p class="text-sm text-indigo-600 mt-2">Lihat semua di <a href="{{ route('statistik.tugas') }}"
+                    <p class="text-sm text-indigo-600 mt-2">Lihat seberapa produktif kamu <a href="{{ route('statistik.tugas') }}"
                             class="font-bold hover:underline">Statistik Tugas</a></p>
                 </div>
 
@@ -415,7 +410,7 @@
 
                 <div class="bg-pink-50 p-6 rounded-2xl border border-pink-200 shadow-md">
                     <h4 class="font-bold text-pink-700 uppercase text-xs mb-3 tracking-wider flex items-center gap-1">
-                        <span class="text-lg">🔥</span> Status Tugas Aktif
+                        <span class="text-lg">🔥</span> Tugas Yang Aktif
                     </h4>
                     @php
                         $totalTugas = count($riwayat_tugas) + count($tugas);
@@ -441,13 +436,14 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-
+            
+// bagian jam yang mengtranslate dari inggris ke indonesia
             if (document.getElementById("deadline")) {
                 flatpickr("#deadline", {
                     enableTime: true,
                     dateFormat: "Y-m-d H:i",
                     time_24hr: true,
-                    locale: "id"
+                    locale: "id" //<-- bagian ini
                 });
             }
 
@@ -456,7 +452,7 @@
                     enableTime: true,
                     dateFormat: "Y-m-d H:i",
                     time_24hr: true,
-                    locale: "id"
+                    locale: "id" //<-- bagian ini
                 });
             }
 

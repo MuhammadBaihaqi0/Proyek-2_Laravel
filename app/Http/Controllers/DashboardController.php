@@ -216,23 +216,23 @@ class DashboardController extends Controller
             if ($totalTugas === 0 && $totalAcara === 0) {
                 $iconKesimpulan = '😴';
                 $kesimpulan = 'Sangat Santai';
-                $saran = 'Bulan ini sangat sepi. Ayo segera tentukan agenda atau buat tugas baru untuk memaksimalkan waktu Anda!';
+                $saran = 'Bulan ini sangat sepi. Ayo yang semangat!';
             } elseif ($rasio >= 90 && $totalTugas >= 10) {
                 $iconKesimpulan = '👑';
                 $kesimpulan = 'Produktivitas Juara!';
-                $saran = 'Pertahankan performa luar biasa ini! Anda efisien dan mampu menyelesaikan hampir semua target.';
+                $saran = 'Pertahankan performa luar biasa ini!';
             } elseif ($rasio >= 70 && $totalTugas >= 5) {
                 $iconKesimpulan = '💪';
                 $kesimpulan = 'Sangat Produktif';
-                $saran = 'Kinerja yang baik! Sedikit dorongan lagi untuk mencapai tingkat penyelesaian sempurna.';
+                $saran = 'Kinerja yang baik!';
             } elseif ($rasio >= 50) {
                 $iconKesimpulan = '🧐';
                 $kesimpulan = 'Cukup Produktif';
-                $saran = 'Progres Anda lumayan, tetapi banyak tugas yang tertinggal. Coba identifikasi penyebab penundaan.';
+                $saran = 'Progres Anda lumayan, tetapi harus lebih ditingkatkan lagi.';
             } elseif ($rasio > 0 && $rasio < 50) {
                 $iconKesimpulan = '🐌';
                 $kesimpulan = 'Kurang Produktif';
-                $saran = 'Rasio penyelesaian Anda rendah. Fokus pada prioritas dan batasi gangguan non-esensial.';
+                $saran = 'Produktivitas Anda rendah. Ayo fokuskan waktu Anda.';
             } elseif ($totalTugas === 2 && $totalAcara > 3) {
                 $iconKesimpulan = '🥳';
                 $kesimpulan = 'Kebanyakan Nongkrong';
@@ -240,7 +240,7 @@ class DashboardController extends Controller
             } else {
                 $iconKesimpulan = '⚠️';
                 $kesimpulan = 'Perlu Perhatian';
-                $saran = 'Tidak ada data tugas yang dapat dianalisis secara efektif. Mulai kembali dengan tugas kecil untuk membangun momentum.';
+                $saran = 'Tidak ada data tugas yang dapat dianalisis secara efektif.';
             }
 
             // 6. Generate Bulan yang Tersedia
